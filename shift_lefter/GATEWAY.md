@@ -5,7 +5,7 @@
 Run the decision engine in a front-door bare Git gateway rather than in every developer clone. Developers use their ordinary `git commit` and `git push` commands. Their local commit already exists; a server-side control cannot intervene in `git add` or `git commit`. The gateway prevents a rejected transaction from making an authoritative upstream ref reachable or triggering the Git host's CI, pull-request, or merge-request consumers.
 
 Git receives proposed objects into a quarantine directory before invoking `pre-receive`. The gateway scans every object newly reachable from all proposed tips, including intermediate-history blobs and human-authored commit or annotated-tag messages. A secret added in one commit and removed in a later commit is still evaluated.
-
+ 
 ```mermaid
 flowchart TD
     A["Developer Git Push"] --> B["SSH Receive Gateway"]
