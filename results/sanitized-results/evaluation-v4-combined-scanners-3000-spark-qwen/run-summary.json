@@ -1,0 +1,30 @@
+{
+  "archived_records_sha256": "b24981e625cbb0fee61ef9c13eca9c1b5a7ff9f0753c2e0d08148badca58de1d",
+  "context_markers_sha256": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+  "duration_seconds": 4142.804,
+  "endpoint_address_redacted_for_publication": true,
+  "execution_source_matches_release": false,
+  "model_endpoints": [
+    "Local model endpoint C (Spark Qwen)"
+  ],
+  "record_count": 6000,
+  "records_sha256": "6a32f3ea652bfa441eb2da5e89202bda929f53ace638e60bdd9df0e95a48ee67",
+  "scanner_versions": {
+    "detect-secrets": "1.5.0",
+    "gitleaks": "8.30.1",
+    "trufflehog": "trufflehog 3.99.1"
+  },
+  "source_set": "expanded-evaluation",
+  "source_sha256": {
+    "canary_index.json": "ac78bffe2ac479ba9190c603398fe80eaed403fbc5062e06b1390a9c98dbed3c",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "execution_runner.py": "4c57e0d0acafe5144e9795100008d140a18a36ed8d0281fbeeedba821e58da19",
+    "experiment.py": "7ca10affbbd392ed53e2439417da3238f1e7f08199ca1cb3191646ac6c243d22",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "ff336cfcb0c3c7f32a3cf86f8fc926e9b4071b8388bf0752d38b8386c3058712",
+    "guard.py": "7f78d169ea832e6375c3b665e531ce5b616f22041c42762592f3f963a6691509"
+  },
+  "study": "evaluation-v4-combined-scanners-3000-spark-qwen",
+  "worker_count": 4,
+  "worktree_clean": true
+}

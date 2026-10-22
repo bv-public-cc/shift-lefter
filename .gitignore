@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+/dist-test/
+build/
+*.egg-info/
+
+# Raw credential-shaped test artifacts must remain outside Git.
+raw/
+run-logs/

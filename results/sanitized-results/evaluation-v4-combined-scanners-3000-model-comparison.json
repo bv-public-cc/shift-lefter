@@ -1,0 +1,117 @@
+{
+  "condition_count": 3,
+  "conditions": {
+    "evaluation-v4-combined-scanners-3000-local-gemma": {
+      "metrics": {
+        "baseline": {
+          "f1": 0.5633802816901409,
+          "fn": 0,
+          "fp": 1550,
+          "precision": 0.39215686274509803,
+          "recall": 1.0,
+          "tn": 450,
+          "tp": 1000
+        },
+        "classifier_latency_median_seconds": 0.905884,
+        "classifier_latency_p95_seconds": 1.788431,
+        "false_positive_reduction": 0.3167741935483871,
+        "hybrid": {
+          "f1": 0.6538084341288002,
+          "fn": 0,
+          "fp": 1059,
+          "precision": 0.48567265662943176,
+          "recall": 1.0,
+          "tn": 941,
+          "tp": 1000
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint B (Gemma)"
+      ],
+      "model_names": [
+        "gemma-4-26B-A4B-it-abliterated-UD-Q6_K.gguf"
+      ],
+      "records_sha256": "1507d619e94d4bd3d2df0da4cadb5690bafd63e658e5e2ba35c33d5290721fa7"
+    },
+    "evaluation-v4-combined-scanners-3000-local-qwen": {
+      "metrics": {
+        "baseline": {
+          "f1": 0.5633802816901409,
+          "fn": 0,
+          "fp": 1550,
+          "precision": 0.39215686274509803,
+          "recall": 1.0,
+          "tn": 450,
+          "tp": 1000
+        },
+        "classifier_latency_median_seconds": 0.940161,
+        "classifier_latency_p95_seconds": 1.941164,
+        "false_positive_reduction": 0.5109677419354839,
+        "hybrid": {
+          "f1": 0.7251631617113851,
+          "fn": 0,
+          "fp": 758,
+          "precision": 0.5688282138794084,
+          "recall": 1.0,
+          "tn": 1242,
+          "tp": 1000
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint A (Qwen)"
+      ],
+      "model_names": [
+        "Huihui-Qwen3.6-35B-A3B-abliterated-Q5_K.gguf"
+      ],
+      "records_sha256": "f4bd9a8028f931eea21bfce1db533a1995452c26336d84aa88b179c14686be6f"
+    },
+    "evaluation-v4-combined-scanners-3000-spark-qwen": {
+      "metrics": {
+        "baseline": {
+          "f1": 0.5633802816901409,
+          "fn": 0,
+          "fp": 1550,
+          "precision": 0.39215686274509803,
+          "recall": 1.0,
+          "tn": 450,
+          "tp": 1000
+        },
+        "classifier_latency_median_seconds": 1.025137,
+        "classifier_latency_p95_seconds": 1.731108,
+        "false_positive_reduction": 0.42258064516129035,
+        "hybrid": {
+          "f1": 0.6908462867012091,
+          "fn": 0,
+          "fp": 895,
+          "precision": 0.5277044854881267,
+          "recall": 1.0,
+          "tn": 1105,
+          "tp": 1000
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint C (Spark Qwen)"
+      ],
+      "model_names": [
+        "qwen3-coder-next"
+      ],
+      "records_sha256": "6a32f3ea652bfa441eb2da5e89202bda929f53ace638e60bdd9df0e95a48ee67"
+    }
+  },
+  "research_phase": "scanner_model_experiment",
+  "scanner_outputs_identical": true,
+  "source_hashes_identical": true,
+  "source_sha256": {
+    "canary_index.json": "ac78bffe2ac479ba9190c603398fe80eaed403fbc5062e06b1390a9c98dbed3c",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "execution_runner.py": "4c57e0d0acafe5144e9795100008d140a18a36ed8d0281fbeeedba821e58da19",
+    "experiment.py": "7ca10affbbd392ed53e2439417da3238f1e7f08199ca1cb3191646ac6c243d22",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "ff336cfcb0c3c7f32a3cf86f8fc926e9b4071b8388bf0752d38b8386c3058712",
+    "guard.py": "7f78d169ea832e6375c3b665e531ce5b616f22041c42762592f3f963a6691509"
+  },
+  "study": "evaluation-v4-combined-scanners-3000-model-comparison"
+}

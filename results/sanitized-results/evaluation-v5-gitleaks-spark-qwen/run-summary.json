@@ -1,0 +1,31 @@
+{
+  "archived_records_sha256": "7cd558198d81779bad14974a2d311a9ce425f123c3d97a565a85083d200b4ccc",
+  "context_markers_sha256": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+  "duration_seconds": 1300.961,
+  "endpoint_address_redacted_for_publication": true,
+  "execution_source_matches_release": true,
+  "model_endpoints": [
+    "Local model endpoint C (Spark Qwen)"
+  ],
+  "record_count": 6000,
+  "records_sha256": "58052d36eb62aac396efed2db1341d368b10bc1eb882b5b6af85716febe49d2d",
+  "scanner_versions": {
+    "gitleaks": "8.30.1"
+  },
+  "selected_scanners": [
+    "gitleaks"
+  ],
+  "source_set": "expanded-evaluation",
+  "source_sha256": {
+    "canary_index.json": "ac78bffe2ac479ba9190c603398fe80eaed403fbc5062e06b1390a9c98dbed3c",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "experiment.py": "a7b82e0a3c5e2bb1f0b4a2d26c543e7dd097ceb4bb34ea8e0975764f38fc2623",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "ff336cfcb0c3c7f32a3cf86f8fc926e9b4071b8388bf0752d38b8386c3058712",
+    "guard.py": "b6bb8c480104f149dafcf2ae74351bfefc24ae39ff85befa144c6a151ecf5563",
+    "scanner_test.py": "f3b3bb4cf2181c642070db697376341f8b3f33f7f07b4feec79f43ba6a0cabd2"
+  },
+  "study": "evaluation-v5-gitleaks-spark-qwen",
+  "worker_count": 4,
+  "worktree_clean": true
+}

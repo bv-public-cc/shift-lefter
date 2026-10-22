@@ -1,0 +1,48 @@
+title = "Shift Lefter synthetic experiment rules"
+
+# Retain Gitleaks' standard provider rules for the operational gateway while
+# adding deterministic synthetic rules used by the frozen research test dataset.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "shift-api-token"
+description = "Synthetic SLAPI token candidate"
+regex = '''SLAPI_[A-Za-z0-9_]{24}'''
+keywords = ["SLAPI_"]
+
+[[rules]]
+id = "shift-generic-token"
+description = "Synthetic SLTOK token candidate"
+regex = '''SLTOK_[A-Za-z0-9_]{24}'''
+keywords = ["SLTOK_"]
+
+[[rules]]
+id = "shift-password-assignment"
+description = "Password assignment candidate"
+regex = '''(?i)(password|passwd)[[:space:]]*[:=][[:space:]]*["'][^"']{8,}["']'''
+keywords = ["password", "passwd"]
+
+[[rules]]
+id = "shift-credential-assignment"
+description = "Credential-like assignment candidate"
+regex = '''(?i)(service[_-]?credential|credential|api[_-]?key|secret|token)[[:space:]]*[:=][[:space:]]*["'][^"']{8,}["']'''
+keywords = ["service_credential", "credential", "api_key", "secret", "token"]
+
+[[rules]]
+id = "shift-active-mode-value"
+description = "Value declared under an active runtime mode"
+regex = '''(?im)mode[[:space:]]*:[[:space:]]*(active|runtime|live)[^\r\n]*[\r\n]+[[:space:]]*value[[:space:]]*:[[:space:]]*["']?[^"'[:space:]]{8,}["']?'''
+keywords = ["mode", "value"]
+
+[[rules]]
+id = "shift-basic-auth"
+description = "Basic authorization candidate"
+regex = '''(?i)Authorization[[:space:]]*:[[:space:]]*Basic[[:space:]]+[A-Za-z0-9+/=]{12,}'''
+keywords = ["Authorization", "Basic"]
+
+[[rules]]
+id = "shift-private-key"
+description = "Private key marker"
+regex = '''-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'''
+keywords = ["PRIVATE KEY"]

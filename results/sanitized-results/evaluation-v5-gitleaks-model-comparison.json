@@ -1,0 +1,117 @@
+{
+  "condition_count": 3,
+  "conditions": {
+    "evaluation-v5-gitleaks-local-gemma": {
+      "metrics": {
+        "baseline": {
+          "f1": 0.6240110079119368,
+          "fn": 93,
+          "fp": 1000,
+          "precision": 0.4756161510225485,
+          "recall": 0.907,
+          "tn": 1000,
+          "tp": 907
+        },
+        "classifier_latency_median_seconds": 1.271642,
+        "classifier_latency_p95_seconds": 2.597728,
+        "false_positive_reduction": 0.439,
+        "hybrid": {
+          "f1": 0.7350081037277147,
+          "fn": 93,
+          "fp": 561,
+          "precision": 0.6178474114441417,
+          "recall": 0.907,
+          "tn": 1439,
+          "tp": 907
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint B (Gemma)"
+      ],
+      "model_names": [
+        "gemma-4-26B-A4B-it-abliterated-UD-Q6_K.gguf"
+      ],
+      "records_sha256": "78b0f69d3e39ef5f5d6bb08c2c6fe7f1ae6582f7d58c821b4c2b3a62976e04c9"
+    },
+    "evaluation-v5-gitleaks-local-qwen": {
+      "metrics": {
+        "baseline": {
+          "f1": 0.6240110079119368,
+          "fn": 93,
+          "fp": 1000,
+          "precision": 0.4756161510225485,
+          "recall": 0.907,
+          "tn": 1000,
+          "tp": 907
+        },
+        "classifier_latency_median_seconds": 1.289163,
+        "classifier_latency_p95_seconds": 2.636777,
+        "false_positive_reduction": 0.591,
+        "hybrid": {
+          "f1": 0.7832469775474956,
+          "fn": 93,
+          "fp": 409,
+          "precision": 0.689209726443769,
+          "recall": 0.907,
+          "tn": 1591,
+          "tp": 907
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint A (Qwen)"
+      ],
+      "model_names": [
+        "Huihui-Qwen3.6-35B-A3B-abliterated-Q5_K.gguf"
+      ],
+      "records_sha256": "70325d00f04f45cadf8ffde716e836e215a2466173184a937523445ad33c0bcf"
+    },
+    "evaluation-v5-gitleaks-spark-qwen": {
+      "metrics": {
+        "baseline": {
+          "f1": 0.6240110079119368,
+          "fn": 93,
+          "fp": 1000,
+          "precision": 0.4756161510225485,
+          "recall": 0.907,
+          "tn": 1000,
+          "tp": 907
+        },
+        "classifier_latency_median_seconds": 1.352336,
+        "classifier_latency_p95_seconds": 2.495659,
+        "false_positive_reduction": 0.435,
+        "hybrid": {
+          "f1": 0.7338187702265372,
+          "fn": 93,
+          "fp": 565,
+          "precision": 0.6161684782608695,
+          "recall": 0.907,
+          "tn": 1435,
+          "tp": 907
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint C (Spark Qwen)"
+      ],
+      "model_names": [
+        "qwen3-coder-next"
+      ],
+      "records_sha256": "58052d36eb62aac396efed2db1341d368b10bc1eb882b5b6af85716febe49d2d"
+    }
+  },
+  "research_phase": "scanner_model_experiment",
+  "scanner_outputs_identical": true,
+  "source_hashes_identical": true,
+  "source_sha256": {
+    "canary_index.json": "ac78bffe2ac479ba9190c603398fe80eaed403fbc5062e06b1390a9c98dbed3c",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "experiment.py": "a7b82e0a3c5e2bb1f0b4a2d26c543e7dd097ceb4bb34ea8e0975764f38fc2623",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "ff336cfcb0c3c7f32a3cf86f8fc926e9b4071b8388bf0752d38b8386c3058712",
+    "guard.py": "b6bb8c480104f149dafcf2ae74351bfefc24ae39ff85befa144c6a151ecf5563",
+    "scanner_test.py": "f3b3bb4cf2181c642070db697376341f8b3f33f7f07b4feec79f43ba6a0cabd2"
+  },
+  "study": "evaluation-v5-gitleaks-model-comparison"
+}

@@ -1,0 +1,49 @@
+FROM python:3.12.7-slim-bookworm
+
+ARG GITLEAKS_VERSION=8.30.1
+ARG GITLEAKS_SHA256=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+ARG TRUFFLEHOG_VERSION=3.99.1
+ARG TRUFFLEHOG_SHA256=a15492ba041e4574ed604ba52a6a49b5f628ff0f13833c18e3cb617021c37d86
+
+# Debian marks a user created without a password as locked, and sshd then
+# rejects public-key authentication before AuthorizedKeysFile is checked.
+# Delete the unusable password while sshd keeps all password methods off.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl git openssh-server tini \
+    && rm -rf /var/lib/apt/lists/* \
+    && python -m pip install --no-cache-dir requests==2.34.2 detect-secrets==1.5.0 \
+    && useradd --create-home --uid 10001 --shell /bin/sh git \
+    && passwd -d git \
+    && install -d -m 0755 /run/sshd /srv/git /srv/evidence /opt/shift-lefter \
+    && chown -R git:git /srv/git /srv/evidence
+
+RUN set -eu; \
+    curl -fsSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tgz; \
+    echo "${GITLEAKS_SHA256}  /tmp/gitleaks.tgz" | sha256sum -c -; \
+    tar -xzf /tmp/gitleaks.tgz -C /usr/local/bin gitleaks; \
+    curl -fsSL "https://github.com/trufflesecurity/trufflehog/releases/download/v${TRUFFLEHOG_VERSION}/trufflehog_${TRUFFLEHOG_VERSION}_linux_amd64.tar.gz" -o /tmp/trufflehog.tgz; \
+    echo "${TRUFFLEHOG_SHA256}  /tmp/trufflehog.tgz" | sha256sum -c -; \
+    tar -xzf /tmp/trufflehog.tgz -C /usr/local/bin trufflehog; \
+    chmod 0755 /usr/local/bin/gitleaks /usr/local/bin/trufflehog; \
+    rm -f /tmp/gitleaks.tgz /tmp/trufflehog.tgz
+
+COPY shift_lefter /opt/shift-lefter/shift_lefter
+COPY shift_lefter/container/gateway_shell.py /usr/local/bin/shift-lefter-gateway-shell
+COPY shift_lefter/container/entrypoint.sh /usr/local/bin/shift-lefter-entrypoint
+COPY shift_lefter/container/sshd_config /etc/ssh/sshd_config
+COPY THIRD_PARTY_LICENSES /usr/share/licenses/shift-lefter/scanners
+
+RUN chmod 0755 /usr/local/bin/shift-lefter-gateway-shell /usr/local/bin/shift-lefter-entrypoint
+
+ENV PYTHONPATH=/opt/shift-lefter \
+    SHIFT_LEFTER_ROOT=/srv/evidence \
+    SHIFT_LEFTER_TRANSIENT_ROOT=/run/shift-lefter \
+    SHIFT_LEFTER_GITLEAKS=/usr/local/bin/gitleaks \
+    SHIFT_LEFTER_TRUFFLEHOG=/usr/local/bin/trufflehog \
+    SHIFT_LEFTER_DETECT_SECRETS=/usr/local/bin/detect-secrets \
+    SHIFT_LEFTER_POLICY_MODE=strict \
+    SHIFT_LEFTER_STANDALONE=1
+
+EXPOSE 2222
+VOLUME ["/srv/git", "/srv/evidence"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/shift-lefter-entrypoint"]

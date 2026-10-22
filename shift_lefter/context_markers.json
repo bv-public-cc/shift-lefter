@@ -1,0 +1,24 @@
+{
+  "markers": [
+    "active",
+    "api",
+    "authorization",
+    "credential",
+    "deployment",
+    "documentation",
+    "dummy",
+    "example",
+    "fictional",
+    "key",
+    "nonfunctional",
+    "password",
+    "placeholder",
+    "redacted",
+    "runtime",
+    "safe",
+    "sample",
+    "secret",
+    "test",
+    "token"
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "baseline": {
+    "f1": 0.6240110079119368,
+    "fn": 93,
+    "fp": 1000,
+    "precision": 0.4756161510225485,
+    "recall": 0.907,
+    "tn": 1000,
+    "tp": 907
+  },
+  "block_rate": 0.371,
+  "classifier_latency_median_seconds": 1.352336,
+  "classifier_latency_p95_seconds": 2.495659,
+  "difference": {
+    "f1": 0.10980776231460043,
+    "precision": 0.140552327238321,
+    "recall": 0.0
+  },
+  "difference_bootstrap_95pct": {
+    "f1": {
+      "high": 0.1193632229744559,
+      "low": 0.10062941916635126
+    },
+    "precision": {
+      "high": 0.15376644950294593,
+      "low": 0.1281024139893388
+    },
+    "recall": {
+      "high": 0.0,
+      "low": 0.0
+    }
+  },
+  "false_positive_reduction": 0.435,
+  "hybrid": {
+    "f1": 0.7338187702265372,
+    "fn": 93,
+    "fp": 565,
+    "precision": 0.6161684782608695,
+    "recall": 0.907,
+    "tn": 1435,
+    "tp": 907
+  },
+  "mcnemar": {
+    "baseline_correct_hybrid_wrong": 0,
+    "baseline_wrong_hybrid_correct": 435,
+    "exact_two_sided_p": 2.2541451703578456e-131
+  },
+  "reason_code_counts": {
+    "classifier_allow": 435,
+    "classifier_block": 863,
+    "classifier_error_fail_closed": 179,
+    "classifier_review_or_low_confidence": 180,
+    "no_scanner_finding": 1093,
+    "non_overridable_hard_block": 250
+  },
+  "repeat_exact_agreement": 1.0,
+  "repeated_artifact_count": 0,
+  "research_phase": "scanner_model_experiment",
+  "review_rate": 0.11966666666666667,
+  "sample_count": 3000,
+  "scanner_only_metrics": {
+    "gitleaks": {
+      "f1": 0.6240110079119368,
+      "fn": 93,
+      "fp": 1000,
+      "precision": 0.4756161510225485,
+      "recall": 0.907,
+      "tn": 1000,
+      "tp": 907
+    }
+  },
+  "selected_scanners": [
+    "gitleaks"
+  ],
+  "source_set": "expanded-evaluation",
+  "study": "evaluation-v5-gitleaks-spark-qwen",
+  "verdict_counts": {
+    "allow": 1528,
+    "block": 1113,
+    "review": 359
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "baseline": {
+    "f1": 0.5633802816901409,
+    "fn": 0,
+    "fp": 1550,
+    "precision": 0.39215686274509803,
+    "recall": 1.0,
+    "tn": 450,
+    "tp": 1000
+  },
+  "block_rate": 0.37633333333333335,
+  "classifier_latency_median_seconds": 0.940161,
+  "classifier_latency_p95_seconds": 1.941164,
+  "difference": {
+    "f1": 0.1617828800212442,
+    "precision": 0.17667135113431037,
+    "recall": 0.0
+  },
+  "difference_bootstrap_95pct": {
+    "f1": {
+      "high": 0.17226873024898237,
+      "low": 0.1516447192402015
+    },
+    "precision": {
+      "high": 0.18959864533794496,
+      "low": 0.16434160312124674
+    },
+    "recall": {
+      "high": 0.0,
+      "low": 0.0
+    }
+  },
+  "false_positive_reduction": 0.5109677419354839,
+  "hybrid": {
+    "f1": 0.7251631617113851,
+    "fn": 0,
+    "fp": 758,
+    "precision": 0.5688282138794084,
+    "recall": 1.0,
+    "tn": 1242,
+    "tp": 1000
+  },
+  "mcnemar": {
+    "baseline_correct_hybrid_wrong": 0,
+    "baseline_wrong_hybrid_correct": 792,
+    "exact_two_sided_p": 7.678447687145631e-239
+  },
+  "reason_code_counts": {
+    "classifier_allow": 792,
+    "classifier_block": 879,
+    "classifier_error_fail_closed": 29,
+    "classifier_review_or_low_confidence": 600,
+    "no_scanner_finding": 450,
+    "non_overridable_hard_block": 250
+  },
+  "repeat_exact_agreement": 1.0,
+  "repeated_artifact_count": 0,
+  "review_rate": 0.20966666666666667,
+  "sample_count": 3000,
+  "scanner_only_metrics": {
+    "detect-secrets": {
+      "f1": 0.4326959130108736,
+      "fn": 423,
+      "fp": 1090,
+      "precision": 0.34613077384523094,
+      "recall": 0.577,
+      "tn": 910,
+      "tp": 577
+    },
+    "gitleaks": {
+      "f1": 0.6240110079119368,
+      "fn": 93,
+      "fp": 1000,
+      "precision": 0.4756161510225485,
+      "recall": 0.907,
+      "tn": 1000,
+      "tp": 907
+    },
+    "trufflehog": {
+      "f1": 0.2950333580429948,
+      "fn": 801,
+      "fp": 150,
+      "precision": 0.5702005730659025,
+      "recall": 0.199,
+      "tn": 1850,
+      "tp": 199
+    }
+  },
+  "source_set": "expanded-evaluation",
+  "study": "evaluation-v4-combined-scanners-3000-local-qwen",
+  "verdict_counts": {
+    "allow": 1242,
+    "block": 1129,
+    "review": 629
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "archived_records_sha256": "40a97a532941345455f4c293e8587dc2c521bb2ab7a34601d4de7c581c088584",
+  "context_markers_sha256": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+  "duration_seconds": 861.087,
+  "endpoint_address_redacted_for_publication": true,
+  "execution_source_matches_release": true,
+  "model_endpoints": [
+    "Local model endpoint A (Qwen)"
+  ],
+  "record_count": 6000,
+  "records_sha256": "2f1faed785a8829e8fa30d6d849964894f0a5457f1998ef9ad0bf9867ad0fe77",
+  "scanner_versions": {
+    "detect-secrets": "1.5.0"
+  },
+  "selected_scanners": [
+    "detect-secrets"
+  ],
+  "source_set": "expanded-evaluation",
+  "source_sha256": {
+    "canary_index.json": "ac78bffe2ac479ba9190c603398fe80eaed403fbc5062e06b1390a9c98dbed3c",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "experiment.py": "a7b82e0a3c5e2bb1f0b4a2d26c543e7dd097ceb4bb34ea8e0975764f38fc2623",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "ff336cfcb0c3c7f32a3cf86f8fc926e9b4071b8388bf0752d38b8386c3058712",
+    "guard.py": "b6bb8c480104f149dafcf2ae74351bfefc24ae39ff85befa144c6a151ecf5563",
+    "scanner_test.py": "f3b3bb4cf2181c642070db697376341f8b3f33f7f07b4feec79f43ba6a0cabd2"
+  },
+  "study": "evaluation-v5-detect-secrets-local-qwen",
+  "worker_count": 4,
+  "worktree_clean": true
+}

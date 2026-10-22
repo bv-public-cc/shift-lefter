@@ -1,0 +1,10 @@
+{
+  "endpoint_address_redacted_for_publication": true,
+  "model_endpoints_local_allowlisted": true,
+  "observed_model_endpoints": [
+    "Local model endpoint B (Gemma)"
+  ],
+  "passed": true,
+  "raw_canary_hit_count_outside_approved_root": 0,
+  "raw_canary_hit_paths": []
+}
