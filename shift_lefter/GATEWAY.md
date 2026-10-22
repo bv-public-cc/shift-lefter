@@ -6,32 +6,36 @@ Run the decision engine in a front-door bare Git gateway rather than in every de
 
 Git receives proposed objects into a quarantine directory before invoking `pre-receive`. The gateway scans every object newly reachable from all proposed tips, including intermediate-history blobs and human-authored commit or annotated-tag messages. A secret added in one commit and removed in a later commit is still evaluated.
 
-```text
-developer git push
-        |
-        v
-SSH receive gateway
-        |
-        v
-unreachable Git quarantine
-        |
-        +--> Gitleaks (standard + research rules) --+
-        +--> TruffleHog ----------------------------+--> normalized candidates
-        +--> detect-secrets ------------------------+
-                                                       |
-                                             structured/redacted prompt
-                                                       |
-                                                       v
-                                                   local LLM
-                                                       |
-                                                       v
-                                         deterministic fail-closed policy
-                                             |                    |
-                                          ALLOW              REVIEW/BLOCK
-                                             |                    |
-                                    durable forward intent   reject transaction;
-                                    atomic leased push       discard quarantine
-                                    to Git host
+```mermaid
+flowchart TD
+    A["Developer Git Push"] --> B["SSH Receive Gateway"]
+    B --> C["Unreachable Git Quarantine"]
+
+    C --> D["Gitleaks<br/>Standard + Research Rules"]
+    C --> E["TruffleHog"]
+    C --> F["detect-secrets"]
+
+    D --> G["Normalized Candidates"]
+    E --> G
+    F --> G
+
+    G --> H["Structured / Redacted Prompt"]
+    H --> I["Local LLM"]
+    I --> J{"Deterministic Fail-Closed Policy"}
+
+    J -->|ALLOW| K["Durable Forward Intent"]
+    K --> L["Atomic Leased Push to Git Host"]
+
+    J -->|REVIEW / BLOCK| M["Reject Transaction"]
+    M --> N["Discard Quarantine"]
+
+    style A fill:#e3f2fd,stroke:#1565c0,color:#000
+    style C fill:#fff3e0,stroke:#ef6c00,color:#000
+    style G fill:#e3f2fd,stroke:#1565c0,color:#000
+    style I fill:#ede7f6,stroke:#673ab7,color:#000
+    style J fill:#fff3e0,stroke:#ef6c00,color:#000
+    style L fill:#e8f5e9,stroke:#2e7d32,color:#000
+    style N fill:#ffebee,stroke:#c62828,color:#000
 ```
 
 The model participates in candidate classification. It receives scanner/rule metadata, file type, candidate-line redactions, allowlisted semantic markers, and structural features. It never receives a raw source line or candidate value. The model cannot override private-key hard blocks. Scanner failures, model failures, malformed responses, ambiguity, and low confidence all reject the receive transaction.
