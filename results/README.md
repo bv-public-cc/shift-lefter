@@ -13,7 +13,9 @@ Each published condition contains:
 
 - `test-data/ground_truth.json` lists every labeled test item, its category, file channel, filename, and SHA-256 digest without publishing the planted value.
 - `test-data/lock.json` records the generator settings and hashes that lock the 3,000-item dataset.
+- `test-data/independent-context-evaluation/` contains the v6 ground-truth manifest and lock file without raw candidate values.
 - `expanded-evaluation-test-data.json` summarizes the positive and safe-item counts by category and channel.
+- `independent-context-evaluation-test-data.json` summarizes the corrected v6 protocol and dataset counts.
 - `shift_lefter/experiment.py` contains the deterministic generator and templates used to reproduce the instantiated files in a protected research directory.
 - `sanitized-results/` contains the publishable decision records and analyses after execution.
 
@@ -31,3 +33,25 @@ must not be cited as evidence of model generalization. The corrected rerun uses
 the separately named `independent-context-evaluation` protocol and v6 result
 names. See `REVIEW-REMEDIATIONS.md`. Existing result files are intentionally
 unchanged so the historical record and its hashes remain intact.
+
+## V6 independent-context results
+
+The corrected v6 publication contains 3,000 artifacts (1,000 positive and
+2,000 negative), with 6,000 sanitized records for each model condition. The
+context template is selected independently of the ground-truth label. All
+three safety-verification reports pass, use redacted endpoint labels, and
+report zero raw-canary hits outside the approved research root.
+
+The scanner baseline achieved precision `0.403361`, recall `0.96`, and F1
+`0.568047`. Neither Gemma nor Spark Qwen changed the effective metrics or
+reduced false positives. Local Qwen allowed one additional positive, reducing
+recall to `0.959` and F1 to `0.567624`, with no false-positive reduction.
+Gemma produced 1,224 semantically invalid classifier responses; those were
+recorded as fail-closed reviews.
+
+The published bundles are:
+
+- `sanitized-results/evaluation-v6-independent-context-local-qwen/`;
+- `sanitized-results/evaluation-v6-independent-context-local-gemma/`;
+- `sanitized-results/evaluation-v6-independent-context-spark-qwen/`;
+- `sanitized-results/evaluation-v6-independent-context-model-comparison.json`.

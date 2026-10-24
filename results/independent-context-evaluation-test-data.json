@@ -1,0 +1,20 @@
+{
+  "artifact_count": 3000,
+  "channels": [
+    "source",
+    "config",
+    "iac",
+    "docs",
+    "agent_prompt"
+  ],
+  "context_label_independent": true,
+  "generator_sha256": "ce96884291fed85e69660df9f5d4c061582e142a5ed37f5b1b4437829c1f487a",
+  "gitleaks_config_sha256": "8bfa17e8326cf357e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+  "manifest_sha256": "4c0b9d58de8ce6d44943cc0fda462bc030a93ae14f08cf755a40bf48c9d30c39",
+  "negative_count": 2000,
+  "positive_count": 1000,
+  "protocol_version": "independent-context-v1",
+  "raw_artifacts_committed": false,
+  "seed": 83017,
+  "set_name": "independent-context-evaluation"
+}
