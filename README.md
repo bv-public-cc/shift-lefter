@@ -34,7 +34,10 @@ starting a gateway:
 
 The full 3,000-item protocol is documented in [STANDALONE-REPRODUCTION.md](shift_lefter/STANDALONE-REPRODUCTION.md).
 The review findings, implemented controls, and corrected rerun namespace are
-recorded in [REVIEW-REMEDIATIONS.md](REVIEW-REMEDIATIONS.md).
+recorded in [REVIEW-REMEDIATIONS.md](REVIEW-REMEDIATIONS.md). The experimental
+batched detector for measuring scanner-miss recovery and corroborated
+false-positive suppression is documented in
+[SEMANTIC-DETECTOR.md](SEMANTIC-DETECTOR.md).
 
 The publishable labeled test-data manifest is in
 [`results/test-data/ground_truth.json`](results/test-data/ground_truth.json),

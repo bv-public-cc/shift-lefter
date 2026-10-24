@@ -134,3 +134,7 @@ unsafe source-code decision on the developer's behalf.
 The historical evaluations remain archived. New runs use the separately named
 `independent-context-evaluation` protocol described in
 `REVIEW-REMEDIATIONS.md`; do not combine its results with the v4/v5 archive.
+The optional `--semantic-batch` v7 condition sends one content-free feature
+packet per file and measures both additional detections and deterministically
+corroborated suppressions. It remains outside Git enforcement; see
+`SEMANTIC-DETECTOR.md`.

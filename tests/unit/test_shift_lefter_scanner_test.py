@@ -124,6 +124,116 @@ def test_runner_limits_discovery_to_selected_scanner(tmp_path, monkeypatch):
     assert all(row["selected_scanners"] == ["gitleaks"] for row in rows)
 
 
+def test_semantic_batch_recovers_miss_and_suppresses_corroborated_false_positive(
+    tmp_path, monkeypatch
+):
+    research = tmp_path / "research"
+    raw = research / "raw" / "semantic"
+    artifacts = raw / "artifacts"
+    artifacts.mkdir(parents=True)
+    secret = artifacts / "secret.py"
+    placeholder = artifacts / "placeholder.py"
+    secret.write_text('password = "opaque-value-123456789"\n', encoding="utf-8")
+    placeholder.write_text('api_token = "EXAMPLE_REPLACE_TOKEN"\n', encoding="utf-8")
+    records = [
+        {
+            "artifact_id": "secret",
+            "filename": secret.name,
+            "label": 1,
+            "sha256": scanner_test.experiment._sha256_file(secret),
+        },
+        {
+            "artifact_id": "placeholder",
+            "filename": placeholder.name,
+            "label": 0,
+            "sha256": scanner_test.experiment._sha256_file(placeholder),
+        },
+    ]
+    (raw / "ground_truth.json").write_text(
+        json.dumps({"records": records}), encoding="utf-8"
+    )
+    monkeypatch.setattr(scanner_test.experiment, "_research_root", lambda: research)
+    monkeypatch.setattr(
+        scanner_test,
+        "_execution_manifest",
+        lambda _commit, _source: {"worktree_clean": True, "source_sha256": {}},
+    )
+    monkeypatch.setattr(
+        scanner_test.subprocess,
+        "run",
+        lambda *_args, **_kwargs: SimpleNamespace(stdout="a" * 40),
+    )
+
+    def scan(path, _scanners):
+        findings = (
+            [{"scanner": "gitleaks", "rule_id": "generic-token", "line": 1}]
+            if path.name == "placeholder.py"
+            else []
+        )
+        return {
+            "findings": findings,
+            "scanner_errors": [],
+            "scanner_versions": {"gitleaks": "test"},
+        }
+
+    def classify(_path, candidates):
+        candidate = candidates[0]
+        if candidate["value_features"]["placeholder_match"]:
+            classification, confidence, evidence = (
+                "false_positive",
+                0.999,
+                ["placeholder_pattern"],
+            )
+        else:
+            classification, confidence, evidence = (
+                "secret",
+                0.99,
+                ["credential_assignment"],
+            )
+        return (
+            [
+                {
+                    "candidate_id": candidate["candidate_id"],
+                    "classification": classification,
+                    "confidence": confidence,
+                    "evidence_codes": evidence,
+                }
+            ],
+            0.1,
+            "test-model",
+            "https://model.internal.example/v1",
+        )
+
+    monkeypatch.setattr(scanner_test.guard, "scan_candidates", scan)
+    monkeypatch.setattr(scanner_test.semantic, "classify_local", classify)
+    name = "evaluation-v7-semantic-test"
+    scanner_test.run(
+        repeats=1,
+        result_name=name,
+        source_set="semantic",
+        workers=1,
+        scanners=["gitleaks"],
+        semantic_batch=True,
+    )
+    analysis = scanner_test.analyze(name, "semantic")
+
+    assert analysis["incremental_outcomes"] == {
+        "recovered_false_negatives": 1,
+        "introduced_false_negatives": 0,
+        "suppressed_false_positives": 1,
+        "introduced_false_positives": 0,
+    }
+    assert analysis["hybrid"] == {
+        "tp": 1,
+        "fp": 0,
+        "tn": 1,
+        "fn": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+    }
+
+
 def test_scanner_selection_rejects_empty_or_unknown_values():
     with __import__("pytest").raises(ValueError, match="at least one"):
         scanner_test._scanners([])

@@ -74,7 +74,9 @@ def _api_key() -> str | None:
     return value
 
 
-def complete_local(messages: list[dict]) -> tuple[str, float, str, str]:
+def complete_local(
+    messages: list[dict], *, json_object: bool = False
+) -> tuple[str, float, str, str]:
     """Send caller-built messages to the allowlisted local endpoint."""
     import requests
 
@@ -90,15 +92,18 @@ def complete_local(messages: list[dict]) -> tuple[str, float, str, str]:
     session = requests.Session()
     session.trust_env = False
     started = time.perf_counter()
+    request = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0.0,
+        "max_tokens": 1024 if json_object else 128,
+    }
+    if json_object:
+        request["response_format"] = {"type": "json_object"}
     response = session.post(
         endpoint + "/chat/completions",
         headers=headers,
-        json={
-            "model": model,
-            "messages": messages,
-            "temperature": 0.0,
-            "max_tokens": 128,
-        },
+        json=request,
         timeout=(5, 60),
         allow_redirects=False,
         verify=verify,
@@ -147,6 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     scanner_test_run = sub.add_parser("scanner-test-run")
     scanner_test_run.add_argument("--repeats", type=int, default=3)
     scanner_test_run.add_argument("--workers", type=int, default=1)
+    scanner_test_run.add_argument("--semantic-batch", action="store_true")
     scanner_test_run.add_argument(
         "--scanner", action="append", choices=guard.DEFAULT_SCANNERS
     )
@@ -176,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
             args.source_set,
             args.workers,
             args.scanner,
+            args.semantic_batch,
         )
     elif args.command == "scanner-test-analyze":
         result = scanner_test.analyze(args.result_name, args.source_set)

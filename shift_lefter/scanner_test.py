@@ -20,7 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import urlparse
 
-from shift_lefter import experiment, guard
+from shift_lefter import experiment, guard, semantic
 
 DEFAULT_RESULT_NAME = "evaluation-v2-combined-scanners"
 RESULT_NAME_PATTERN = re.compile(r"evaluation-v[0-9]+-[a-z0-9][a-z0-9-]*$")
@@ -110,6 +110,7 @@ def _execution_manifest(source_commit: str, source_set: str) -> dict:
         "scanner_test.py": Path(__file__).resolve(),
         "experiment.py": Path(experiment.__file__).resolve(),
         "guard.py": Path(guard.__file__).resolve(),
+        "semantic.py": Path(semantic.__file__).resolve(),
         "context_markers.json": guard.CONTEXT_MARKERS,
         "gitleaks.toml": experiment.CONFIG,
         "ground_truth.json": raw / "ground_truth.json",
@@ -130,6 +131,7 @@ def run(
     source_set: str = "evaluation",
     workers: int = 1,
     scanners: Iterable[str] | None = None,
+    semantic_batch: bool = False,
 ) -> dict:
     result_name = _result_name(result_name)
     selected_scanners = _scanners(scanners)
@@ -196,30 +198,68 @@ def run(
             }
         )
 
+        candidates = (
+            semantic.candidate_features(artifact, findings) if semantic_batch else []
+        )
         repeat_count = (
-            repeats if findings and not errors and not _hard_block(findings) else 1
+            repeats
+            if (candidates if semantic_batch else findings)
+            and not errors
+            and not _hard_block(findings)
+            else 1
         )
         for repeat in range(1, repeat_count + 1):
             classifications = []
             elapsed = 0.0
             model_names: set[str] = set()
-            for target in guard.classification_targets(findings) if not errors else []:
+            classification_error = None
+            if (
+                semantic_batch
+                and candidates
+                and not errors
+                and not _hard_block(findings)
+            ):
                 try:
-                    result, seconds, model_name, endpoint = guard.classify_redacted(
-                        artifact, target
+                    result, seconds, model_name, endpoint = semantic.classify_local(
+                        artifact, candidates
                     )
-                    classifications.append(result)
+                    classifications.extend(result)
                     elapsed += seconds
                     model_names.add(model_name)
                     observed_endpoints.add(endpoint)
                 except Exception as exc:
-                    classifications.append({"error": type(exc).__name__})
-            verdict, reason = guard.decide_findings(
-                findings,
-                classifications,
-                errors,
-                allow_classifier_allow=True,
-            )
+                    classification_error = type(exc).__name__
+            elif not semantic_batch:
+                for target in (
+                    guard.classification_targets(findings) if not errors else []
+                ):
+                    try:
+                        result, seconds, model_name, endpoint = guard.classify_redacted(
+                            artifact, target
+                        )
+                        classifications.append(result)
+                        elapsed += seconds
+                        model_names.add(model_name)
+                        observed_endpoints.add(endpoint)
+                    except Exception as exc:
+                        classifications.append({"error": type(exc).__name__})
+            if semantic_batch:
+                if classification_error:
+                    verdict, reason = (
+                        baseline_verdict,
+                        "semantic_error_scanner_fallback",
+                    )
+                else:
+                    verdict, reason = semantic.decide(
+                        findings, candidates, classifications, errors
+                    )
+            else:
+                verdict, reason = guard.decide_findings(
+                    findings,
+                    classifications,
+                    errors,
+                    allow_classifier_allow=True,
+                )
             rows.append(
                 {
                     **common,
@@ -230,15 +270,26 @@ def run(
                     "classifier_seconds": round(elapsed, 6),
                     "model_names": sorted(model_names) or ["not_invoked"],
                     "classifier_verdicts": [
-                        item.get("verdict", "error") for item in classifications
-                    ],
+                        item.get("classification", item.get("verdict", "error"))
+                        for item in classifications
+                    ]
+                    or (["error"] if classification_error else []),
                     "classifier_confidences": [
                         item.get("confidence") for item in classifications
                     ],
                     "classifier_reason_codes": [
-                        item.get("reason_code", item.get("error", "error"))
+                        item.get(
+                            "reason_code",
+                            ",".join(item.get("evidence_codes", []))
+                            or item.get("error", "error"),
+                        )
                         for item in classifications
-                    ],
+                    ]
+                    or ([classification_error] if classification_error else []),
+                    "semantic_candidate_count": len(candidates),
+                    "semantic_scanner_hit_candidate_count": sum(
+                        item["scanner_hit"] for item in candidates
+                    ),
                 }
             )
         return rows, observed_endpoints, scan["scanner_versions"]
@@ -257,6 +308,9 @@ def run(
         "record_count": sum(1 for _ in output.open(encoding="utf-8")),
         "worker_count": workers,
         "selected_scanners": list(selected_scanners),
+        "classifier_strategy": (
+            "batched_semantic_detector" if semantic_batch else "per_finding_context"
+        ),
         "duration_seconds": round(time.perf_counter() - started, 3),
         "model_endpoints": sorted(endpoints),
         "scanner_versions": scanner_versions,
@@ -320,6 +374,19 @@ def analyze(
     ]
     verdict_counts = Counter(row["verdict"] for row in hybrid)
     reason_counts = Counter(row["reason_code"] for row in hybrid)
+    baseline_by_id = {row["artifact_id"]: row for row in baseline}
+    hybrid_by_id = {row["artifact_id"]: row for row in hybrid}
+    recovered_false_negatives = introduced_false_negatives = 0
+    suppressed_false_positives = introduced_false_positives = 0
+    for artifact_id, actual in truth.items():
+        baseline_positive = baseline_by_id[artifact_id]["verdict"] != "allow"
+        hybrid_positive = hybrid_by_id[artifact_id]["verdict"] != "allow"
+        if actual["label"] == 1:
+            recovered_false_negatives += int(not baseline_positive and hybrid_positive)
+            introduced_false_negatives += int(baseline_positive and not hybrid_positive)
+        else:
+            suppressed_false_positives += int(baseline_positive and not hybrid_positive)
+            introduced_false_positives += int(not baseline_positive and hybrid_positive)
     summary = {
         "study": result_name,
         "research_phase": "scanner_model_experiment",
@@ -344,6 +411,15 @@ def analyze(
         "block_rate": sum(row["verdict"] == "block" for row in hybrid) / len(hybrid),
         "verdict_counts": dict(sorted(verdict_counts.items())),
         "reason_code_counts": dict(sorted(reason_counts.items())),
+        "incremental_outcomes": {
+            "recovered_false_negatives": recovered_false_negatives,
+            "introduced_false_negatives": introduced_false_negatives,
+            "suppressed_false_positives": suppressed_false_positives,
+            "introduced_false_positives": introduced_false_positives,
+        },
+        "classifier_strategy": run_summary.get(
+            "classifier_strategy", "per_finding_context"
+        ),
         "repeat_exact_agreement": sum(stability) / len(stability) if stability else 1.0,
         "repeated_artifact_count": len(stability),
         "classifier_latency_median_seconds": (
@@ -591,6 +667,7 @@ def main(argv: list[str] | None = None) -> int:
     run_parser = sub.add_parser("run")
     run_parser.add_argument("--repeats", type=int, default=3)
     run_parser.add_argument("--workers", type=int, default=1)
+    run_parser.add_argument("--semantic-batch", action="store_true")
     run_parser.add_argument(
         "--scanner", action="append", choices=guard.DEFAULT_SCANNERS
     )
@@ -615,6 +692,7 @@ def main(argv: list[str] | None = None) -> int:
             args.source_set,
             args.workers,
             args.scanner,
+            args.semantic_batch,
         )
         if args.command == "run"
         else (
