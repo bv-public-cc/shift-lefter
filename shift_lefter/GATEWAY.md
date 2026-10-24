@@ -16,7 +16,7 @@ SSH receive gateway
 unreachable Git quarantine
         |
         +--> Gitleaks (standard + research rules) --+
-        +--> TruffleHog ----------------------------+--> normalized candidates
+        +--> TruffleHog ----------------------------+--> potential secrets in one format
         +--> detect-secrets ------------------------+
                                                        |
                                                        v
@@ -98,7 +98,7 @@ The gateway is transparent to the developer's commands, not invisible to platfor
 
 1. Test in an isolated project using synthetic and revoked credentials.
 2. Validate authentication, identity binding, protected refs, force pushes, tags, deletes, multi-ref atomicity, concurrency, outages, and size limits.
-3. Begin with deterministic hard blocks and contextual decisions in observe-only reporting.
+3. Begin with fixed-rule hard blocks and report context-based decisions without enforcing them.
 4. Enable enforcement only after representative recall, false-positive, stability, and latency thresholds pass.
 5. Retain CI scanning, credential rotation, and incident response as independent controls.
 6. Deploy through the normal infrastructure process. Building and testing this image does not authorize or perform deployment.

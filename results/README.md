@@ -15,15 +15,19 @@ Each published condition contains:
 
 - `test-data/ground_truth.json` lists every labeled test item, its category, file channel, filename, and SHA-256 digest without publishing the planted value.
 - `test-data/lock.json` records the generator settings and hashes that lock the 3,000-item dataset.
-- `test-data/independent-context-evaluation/` contains the v6 ground-truth manifest and lock file without raw candidate values.
+- `test-data/independent-context-evaluation/` contains the v6 answer key and lock file without the raw values being checked.
 - `expanded-evaluation-test-data.json` summarizes the positive and safe-item counts by category and channel.
 - `independent-context-evaluation-test-data.json` summarizes the corrected v6 protocol and dataset counts.
-- `shift_lefter/experiment.py` contains the deterministic generator and templates used to reproduce the instantiated files in a protected research directory.
+- `shift_lefter/experiment.py` contains the repeatable generator and templates. The same fixed seed recreates the same test files in a protected research directory.
 - `sanitized-results/` contains the publishable decision records and analyses after execution.
 
 The instantiated positive files are deliberately absent from Git because even nonfunctional credential-shaped examples can be copied into logs, demonstrations, or detection systems. Regeneration produces those files locally from the published seed and generator; it does not make them publication material.
 
-The committed generator, fixed seed, ground-truth manifest, and test-data lock let a reviewer regenerate and verify the test dataset without storing the instantiated candidates in source control. Internal endpoint addresses are replaced by stable labels in the public copy. The research archive retains the original content-free records and hashes.
+The committed generator, fixed seed, answer key, and test-data lock let a
+reviewer recreate and verify the test dataset without storing the generated
+credential-like values in source control. Internal endpoint addresses are
+replaced by stable labels in the public copy. The research archive retains the
+original records without secret values, along with their hashes.
 
 The 300-item v2 experiment is a pilot. The 3,000-item v3 execution is retained as defect-discovery evidence, and the v4 experiment evaluates the corrections against the same locked test data. Both are part of the research. The chronology and reuse of inspected data are stated so readers do not mistake v4 for a new independent holdout test. The v5 single-scanner experiment isolates the contribution of Gitleaks, TruffleHog, and detect-secrets across the same three model conditions.
 
@@ -63,7 +67,7 @@ The published bundles are:
 The v7 evaluation replaces the earlier shallow synthetic protocol with 6,000
 artifacts grouped into 300 simulated repositories. Sixty repositories (1,200
 artifacts) are reserved for calibration and 240 repositories (4,800 artifacts)
-form an untouched holdout. The corpus covers 16 credential families, 16 safe
+form an untouched holdout. The test set covers 16 credential families, 16 safe
 lookalike families, 10 source/configuration/infrastructure/documentation/test
 layouts, and both direct and split runtime assignments. Context is generated
 independently of the label.
@@ -73,10 +77,11 @@ suppression thresholds. On holdout it recovered 104 scanner false negatives,
 suppressed 61 false positives, and introduced zero false negatives and zero
 false positives. Across the full 6,000 artifacts it recovered 125 and
 suppressed 75. Private-key findings remained non-overridable, and 473 model
-errors fell back to scanner decisions. Median semantic latency was 4.93 seconds
+errors fell back to scanner decisions. Median model review time was 4.93 seconds
 and p95 latency was 6.16 seconds.
 
 See `V7-OPERATIONAL-RESULTS.md` for the complete per-model results, method,
-hashes, and limitations. The v7 evidence is conclusive for this locked corpus;
-it is credible operational emulation, not a claim that a synthetic corpus
-establishes universal performance on every real repository.
+hashes, and limitations. The v7 evidence gives a clear result for this fixed
+test set. It provides a credible simulation of everyday development work, but
+it does not prove that the system will perform the same way in every real
+repository.

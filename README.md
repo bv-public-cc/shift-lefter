@@ -1,13 +1,13 @@
 # Shift Lefter: Local Secret-Prevention Gateway and Reproducible Tests
 
-This reference implementation evaluates deterministic secret scanning against
-the same candidates plus a governed local contextual classifier. Its experiment
+This reference implementation compares standard secret scanning with the same
+potential secrets reviewed by a controlled local classifier. Its experiment
 runner, model client, policy engine, evidence writer, and Git receive gateway
 operate as a self-contained package.
 
 Raw credential-shaped test files and the canary index must live outside every Git
 worktree. A publishable ground-truth manifest may contain opaque IDs, labels,
-categories, filenames, and hashes, but no candidate values. The runner stores
+categories, filenames, and hashes, but none of the values being checked. The runner stores
 only hashes, rule identifiers, categorical verdicts, timing, and endpoint
 metadata in its sanitized output. The standalone model client accepts only exact
 allowlisted OpenAI-compatible local endpoints, rejects redirects, and ignores
@@ -183,12 +183,14 @@ The same runner supports a single-scanner contribution test through repeated
 conditions. Each run records the selected scanner in every result row and the
 run manifest. The reproduction guide shows how to compare models within one
 scanner and how to summarize different scanners without pretending that they
-produced identical candidates.
+reported the same potential secrets.
 
-The archived v4/v5 corpus contains class-correlated context vocabulary and is
-retained only as historical defect-discovery evidence. New runs must use
+The archived v4/v5 test set contains context words that reveal the expected
+label. It is kept only as a record of previously found problems. New runs must
+use
 `independent-context-evaluation`; its neutral context templates are distributed
-across both labels, and candidate-line words are not projected into prompts.
+across both labels, and words from the line containing the potential secret are
+not copied into prompts.
 
 ## Third-party scanners
 

@@ -13,14 +13,14 @@ The recommended protocol is the separately versioned
 - TruffleHog 3.99.1 with update and online verification disabled;
 - detect-secrets 1.5.0 with online verification disabled;
 - structured/redacted context sent to each local model;
-- candidate lines represented only by a hash plus allowlisted semantic and structural features;
+- lines containing potential secrets represented only by a hash and approved meaning and structure details;
 - strict `allow`, `review`, or `block` response validation, including verdict/reason consistency;
-- deterministic fail-closed policy and non-overridable private-key findings;
+- rule-based fail-closed policy, which blocks on errors, and private-key findings that the model cannot override;
 - one classification pass per artifact, with the earlier 300-item pilot retaining three repetitions for stability evidence;
-- four bounded workers, with output written in deterministic test-manifest order;
+- four limited workers, with output always written in test-manifest order;
 - separate result sets for each model and a comparison that refuses unequal scanner inputs or source hashes.
 
-The original locked Gitleaks-only study and the 300-item v2 combined-scanner test remain archival results. The original study's bounded prompt included raw synthetic source context. The 3,000-item v3 execution is retained as defect-discovery evidence: it exposed scanner misses, unsafe contextual downgrades, and an unauthenticated model condition. The v4/v5 `expanded-evaluation` corpus also contains label-correlated context vocabulary. Do not describe these protocols as independent validation or pool statistics across versions. New executions use `independent-context-evaluation` and v6 result names as specified in `REVIEW-REMEDIATIONS.md`.
+The original fixed Gitleaks-only study and the 300-item v2 combined-scanner test remain archived results. The original study's limited prompt included raw generated source context. The 3,000-item v3 run is kept because it uncovered scanner misses, unsafe contextual downgrades, and an unauthenticated model condition. The v4/v5 `expanded-evaluation` test set also contains context words that reveal the expected label. Do not present these tests as independent validation or combine their statistics across versions. New runs use `independent-context-evaluation` and v6 result names as specified in `REVIEW-REMEDIATIONS.md`.
 
 ## 2. Security boundary
 
@@ -32,11 +32,11 @@ The v4 path provides these controls:
 - temporary Git-object materialization uses `SHIFT_LEFTER_TRANSIENT_ROOT`, which should be a private tmpfs or other ephemeral directory;
 - TruffleHog uses `--no-update --no-verification` and detect-secrets uses `--no-verify`;
 - model hosts require an exact allowlist, redirects are rejected, ambient proxies are disabled, and non-loopback HTTP is rejected unless a second exact-host lab exception is configured;
-- model prompts contain no raw source line or candidate value;
+- model prompts contain no raw source line or potential secret value;
 - result records reject raw-content field names and contain hashes, identifiers, categorical decisions, timing, and versions only;
 - scanner, transport, response-schema, or model failures become `review`, which rejects a gateway transaction.
 
-Hashes of artifacts and redacted lines remain sensitive metadata. Protect the research root and apply a retention policy even though result records do not contain raw candidates.
+Hashes of files and redacted lines are still sensitive information. Protect the research folder and set a retention period even though result records do not contain the raw values being checked.
 
 ## 3. Minimal directory
 
@@ -240,8 +240,8 @@ export SHIFT_LEFTER_POLICY_MODE=strict
 Test at minimum:
 
 1. a clean initial push is accepted and the same ref reaches the upstream;
-2. a push containing a synthetic candidate is rejected and neither ref moves;
-3. a candidate added in one commit and removed in a later commit is still rejected;
+2. a push containing a generated test secret is rejected and neither ref moves;
+3. a test secret added in one commit and removed in a later commit is still rejected;
 4. scanner and model outages reject the transaction;
 5. a concurrent upstream ref change causes the per-ref lease to reject forwarding;
 6. multi-ref forwarding is atomic;

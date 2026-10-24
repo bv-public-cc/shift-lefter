@@ -2,15 +2,17 @@
 
 This file records the remediation of the findings reviewed on 2026-10-23. The
 committed v4 and v5 result bundles are historical evidence. They used the
-`expanded-evaluation` corpus, whose safe and positive contexts contained
-class-correlated words. Those metrics must not be presented as validation of
-generalization or combined with results produced after this change.
+`expanded-evaluation` test set, whose safe and positive examples contained
+words that revealed the expected label. Do not present those measurements as
+proof that the system works on new data or combine them with results produced
+after this change.
 
 ## Implemented changes
 
-1. **Label leakage:** the new `independent-context-evaluation` protocol uses
-   the same four neutral context templates for both labels. Candidate-line
-   semantic markers are no longer projected into the model prompt. The
+1. **Answer clues in test data:** the new `independent-context-evaluation` test
+   uses the same four neutral context templates for both labels. Words from the
+   line containing the potential secret are no longer copied into the model
+   prompt. The
    manifest records `protocol_version=independent-context-v1` and
    `context_label_independent=true`.
 2. **Enforcement/model ambiguity:** `scan_file`, the clean filter, hooks, and
@@ -80,6 +82,7 @@ export SHIFT_LEFTER_ROOT="$HOME/.local/share/shift-lefter-rerun"
 
 Repeat under unique result names for every frozen model condition. Commit the
 code and run from a clean worktree before `scanner-test-run`; the runner refuses
-a dirty tracked worktree. This synthetic protocol removes direct context-label
-leakage, but it is not an independently authored real-repository holdout. Any
-external-validity claim still requires a separately sourced and labeled corpus.
+a Git worktree with uncommitted tracked changes. This generated test removes
+context words that reveal the expected label, but it is not a separately
+created set of real repositories. Any claim about real-world performance still
+requires a separately sourced and labeled dataset.

@@ -10,7 +10,7 @@ outside Git because they contain credential-shaped values.
 - 240 untouched holdout repositories (4,800 artifacts)
 - repository-grouped split with label-independent context
 - 16 credential families, 16 safe lookalike families, and 10 layouts
-- deterministic seed `170031`
+- fixed seed `170031`, which recreates the same files on every run
 
 `ground_truth.json` contains artifact IDs, labels, partitions, categories,
 channels, filenames, repository IDs, and SHA-256 digests only. `lock.json`
