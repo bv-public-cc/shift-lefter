@@ -42,6 +42,26 @@ def test_nested_placeholder_is_deterministically_visible_without_raw_value(tmp_p
     assert "EXAMPLE_NOT_A_PASSWORD" not in json.dumps(candidate)
 
 
+@pytest.mark.parametrize(
+    ("filename", "content"),
+    [
+        ("settings.json", '{"stripe_api_key": "sk_live_opaquevalue123456789"}\n'),
+        ("settings.js", 'const storage_connection = "opaquevalue123456789";\n'),
+    ],
+)
+def test_json_and_javascript_credential_assignments_become_candidates(
+    tmp_path, filename, content
+):
+    artifact = tmp_path / filename
+    artifact.write_text(content, encoding="utf-8")
+
+    candidates = semantic.candidate_features(artifact, [])
+
+    assert len(candidates) == 1
+    assert candidates[0]["context_features"]["assignment_category"] == "credential"
+    assert "opaquevalue123456789" not in json.dumps(candidates)
+
+
 def test_semantic_response_requires_every_candidate_and_safe_evidence():
     payload = json.dumps(
         {

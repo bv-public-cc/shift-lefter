@@ -53,6 +53,10 @@ TOKEN_RE = re.compile(
     r"https?://[^\s'\"]+|(?:SLAPI|SLTOK)_[A-Za-z0-9_]{16,}|[A-Za-z0-9+/]{24,}={0,2})"
 )
 ASSIGNMENT_RE = re.compile(r"^\s*([A-Za-z_][A-Za-z0-9_.-]{1,80})\s*[:=]")
+JSON_ASSIGNMENT_RE = re.compile(r'^\s*\{?\s*"([A-Za-z_][A-Za-z0-9_.-]{1,80})"\s*:')
+JAVASCRIPT_ASSIGNMENT_RE = re.compile(
+    r"^\s*(?:const|let|var)\s+([A-Za-z_][A-Za-z0-9_.-]{1,80})\s*="
+)
 CREDENTIAL_KEYS = {
     "api_key",
     "api_token",
@@ -111,7 +115,11 @@ def _charset(value: str) -> str:
 
 
 def _assignment_category(line: str) -> str:
-    match = ASSIGNMENT_RE.search(line)
+    match = (
+        ASSIGNMENT_RE.search(line)
+        or JSON_ASSIGNMENT_RE.search(line)
+        or JAVASCRIPT_ASSIGNMENT_RE.search(line)
+    )
     if not match:
         if re.search(r"Authorization\s*:\s*(?:Basic|Bearer)", line, re.IGNORECASE):
             return "authorization"
@@ -123,7 +131,16 @@ def _assignment_category(line: str) -> str:
         return "nonsecret_identifier"
     if key in CREDENTIAL_KEYS or any(
         part in key
-        for part in ("password", "secret", "token", "credential", "auth", "webhook")
+        for part in (
+            "password",
+            "secret",
+            "token",
+            "credential",
+            "auth",
+            "webhook",
+            "api_key",
+            "connection",
+        )
     ):
         return "credential"
     return "other"
