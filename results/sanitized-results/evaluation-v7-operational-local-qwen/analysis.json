@@ -1,0 +1,150 @@
+{
+  "baseline": {
+    "f1": 0.5902986253752567,
+    "fn": 132,
+    "fp": 2461,
+    "precision": 0.4315084315084315,
+    "recall": 0.934,
+    "tn": 1539,
+    "tp": 1868
+  },
+  "block_rate": 0.7215,
+  "classifier_latency_median_seconds": 3.420844,
+  "classifier_latency_p95_seconds": 4.440406,
+  "classifier_strategy": "batched_semantic_detector",
+  "difference": {
+    "f1": 0.0,
+    "precision": 0.0,
+    "recall": 0.0
+  },
+  "difference_bootstrap_95pct": {
+    "f1": {
+      "high": 0.0,
+      "low": 0.0
+    },
+    "precision": {
+      "high": 0.0,
+      "low": 0.0
+    },
+    "recall": {
+      "high": 0.0,
+      "low": 0.0
+    }
+  },
+  "false_positive_reduction": 0.0,
+  "hybrid": {
+    "f1": 0.5902986253752567,
+    "fn": 132,
+    "fp": 2461,
+    "precision": 0.4315084315084315,
+    "recall": 0.934,
+    "tn": 1539,
+    "tp": 1868
+  },
+  "incremental_outcomes": {
+    "introduced_false_negatives": 0,
+    "introduced_false_positives": 0,
+    "recovered_false_negatives": 0,
+    "suppressed_false_positives": 0
+  },
+  "mcnemar": {
+    "baseline_correct_hybrid_wrong": 0,
+    "baseline_wrong_hybrid_correct": 0,
+    "exact_two_sided_p": 1.0
+  },
+  "partition_metrics": {
+    "calibration": {
+      "baseline": {
+        "f1": 0.5930599369085174,
+        "fn": 21,
+        "fp": 495,
+        "precision": 0.4316877152698048,
+        "recall": 0.947103274559194,
+        "tn": 308,
+        "tp": 376
+      },
+      "hybrid": {
+        "f1": 0.5930599369085174,
+        "fn": 21,
+        "fp": 495,
+        "precision": 0.4316877152698048,
+        "recall": 0.947103274559194,
+        "tn": 308,
+        "tp": 376
+      },
+      "sample_count": 1200
+    },
+    "holdout": {
+      "baseline": {
+        "f1": 0.5896067970756768,
+        "fn": 111,
+        "fp": 1966,
+        "precision": 0.43146327356853675,
+        "recall": 0.9307548346849657,
+        "tn": 1231,
+        "tp": 1492
+      },
+      "hybrid": {
+        "f1": 0.5896067970756768,
+        "fn": 111,
+        "fp": 1966,
+        "precision": 0.43146327356853675,
+        "recall": 0.9307548346849657,
+        "tn": 1231,
+        "tp": 1492
+      },
+      "sample_count": 4800
+    }
+  },
+  "reason_code_counts": {
+    "no_secret_detected": 1671,
+    "non_overridable_hard_block": 125,
+    "semantic_error_scanner_fallback": 1,
+    "semantic_scanner_hold": 4203
+  },
+  "repeat_exact_agreement": 1.0,
+  "repeated_artifact_count": 0,
+  "research_phase": "scanner_model_experiment",
+  "review_rate": 0.0,
+  "sample_count": 6000,
+  "scanner_only_metrics": {
+    "detect-secrets": {
+      "f1": 0.5855513307984792,
+      "fn": 383,
+      "fp": 1906,
+      "precision": 0.45898382060743687,
+      "recall": 0.8085,
+      "tn": 2094,
+      "tp": 1617
+    },
+    "gitleaks": {
+      "f1": 0.6944444444444444,
+      "fn": 375,
+      "fp": 1055,
+      "precision": 0.6063432835820896,
+      "recall": 0.8125,
+      "tn": 2945,
+      "tp": 1625
+    },
+    "trufflehog": {
+      "f1": 0.49849849849849853,
+      "fn": 1253,
+      "fp": 250,
+      "precision": 0.7492477432296891,
+      "recall": 0.3735,
+      "tn": 3750,
+      "tp": 747
+    }
+  },
+  "selected_scanners": [
+    "gitleaks",
+    "trufflehog",
+    "detect-secrets"
+  ],
+  "source_set": "operational-holdout-v1",
+  "study": "evaluation-v7-operational-local-qwen",
+  "verdict_counts": {
+    "allow": 1671,
+    "block": 4329
+  }
+}

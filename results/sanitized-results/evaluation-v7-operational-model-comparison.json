@@ -1,0 +1,272 @@
+{
+  "condition_count": 3,
+  "conditions": {
+    "evaluation-v7-operational-local-gemma": {
+      "endpoint_address_redacted_for_publication": true,
+      "metrics": {
+        "baseline": {
+          "f1": 0.5902986253752567,
+          "fn": 132,
+          "fp": 2461,
+          "precision": 0.4315084315084315,
+          "recall": 0.934,
+          "tn": 1539,
+          "tp": 1868
+        },
+        "classifier_latency_median_seconds": 3.6090695,
+        "classifier_latency_p95_seconds": 4.57312,
+        "false_positive_reduction": 0.13693620479479887,
+        "hybrid": {
+          "f1": 0.6234979973297731,
+          "fn": 132,
+          "fp": 2124,
+          "precision": 0.467935871743487,
+          "recall": 0.934,
+          "tn": 1876,
+          "tp": 1868
+        },
+        "incremental_outcomes": {
+          "introduced_false_negatives": 0,
+          "introduced_false_positives": 0,
+          "recovered_false_negatives": 0,
+          "suppressed_false_positives": 337
+        },
+        "partition_metrics": {
+          "calibration": {
+            "baseline": {
+              "f1": 0.5930599369085174,
+              "fn": 21,
+              "fp": 495,
+              "precision": 0.4316877152698048,
+              "recall": 0.947103274559194,
+              "tn": 308,
+              "tp": 376
+            },
+            "hybrid": {
+              "f1": 0.6282372598162071,
+              "fn": 21,
+              "fp": 424,
+              "precision": 0.47,
+              "recall": 0.947103274559194,
+              "tn": 379,
+              "tp": 376
+            },
+            "sample_count": 1200
+          },
+          "holdout": {
+            "baseline": {
+              "f1": 0.5896067970756768,
+              "fn": 111,
+              "fp": 1966,
+              "precision": 0.43146327356853675,
+              "recall": 0.9307548346849657,
+              "tn": 1231,
+              "tp": 1492
+            },
+            "hybrid": {
+              "f1": 0.6223149113660063,
+              "fn": 111,
+              "fp": 1700,
+              "precision": 0.4674185463659148,
+              "recall": 0.9307548346849657,
+              "tn": 1497,
+              "tp": 1492
+            },
+            "sample_count": 4800
+          }
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint B (Gemma)"
+      ],
+      "model_names": [
+        "gemma-4-26B-A4B-it-abliterated-UD-Q6_K.gguf"
+      ],
+      "records_sha256": "a5f3c2df2f8e7d9606ff6def893f4d40f4bf29027fdb5b56f5aad3b71386d1d2"
+    },
+    "evaluation-v7-operational-local-qwen": {
+      "endpoint_address_redacted_for_publication": true,
+      "metrics": {
+        "baseline": {
+          "f1": 0.5902986253752567,
+          "fn": 132,
+          "fp": 2461,
+          "precision": 0.4315084315084315,
+          "recall": 0.934,
+          "tn": 1539,
+          "tp": 1868
+        },
+        "classifier_latency_median_seconds": 3.420844,
+        "classifier_latency_p95_seconds": 4.440406,
+        "false_positive_reduction": 0.0,
+        "hybrid": {
+          "f1": 0.5902986253752567,
+          "fn": 132,
+          "fp": 2461,
+          "precision": 0.4315084315084315,
+          "recall": 0.934,
+          "tn": 1539,
+          "tp": 1868
+        },
+        "incremental_outcomes": {
+          "introduced_false_negatives": 0,
+          "introduced_false_positives": 0,
+          "recovered_false_negatives": 0,
+          "suppressed_false_positives": 0
+        },
+        "partition_metrics": {
+          "calibration": {
+            "baseline": {
+              "f1": 0.5930599369085174,
+              "fn": 21,
+              "fp": 495,
+              "precision": 0.4316877152698048,
+              "recall": 0.947103274559194,
+              "tn": 308,
+              "tp": 376
+            },
+            "hybrid": {
+              "f1": 0.5930599369085174,
+              "fn": 21,
+              "fp": 495,
+              "precision": 0.4316877152698048,
+              "recall": 0.947103274559194,
+              "tn": 308,
+              "tp": 376
+            },
+            "sample_count": 1200
+          },
+          "holdout": {
+            "baseline": {
+              "f1": 0.5896067970756768,
+              "fn": 111,
+              "fp": 1966,
+              "precision": 0.43146327356853675,
+              "recall": 0.9307548346849657,
+              "tn": 1231,
+              "tp": 1492
+            },
+            "hybrid": {
+              "f1": 0.5896067970756768,
+              "fn": 111,
+              "fp": 1966,
+              "precision": 0.43146327356853675,
+              "recall": 0.9307548346849657,
+              "tn": 1231,
+              "tp": 1492
+            },
+            "sample_count": 4800
+          }
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint A (Qwen)"
+      ],
+      "model_names": [
+        "Huihui-Qwen3.6-35B-A3B-abliterated-Q5_K.gguf"
+      ],
+      "records_sha256": "03c197052d7f62caad98cb51c7f5c178d69489d62e89ca12e5f855d76427cf25"
+    },
+    "evaluation-v7-operational-spark-qwen-calibrated": {
+      "endpoint_address_redacted_for_publication": true,
+      "metrics": {
+        "baseline": {
+          "f1": 0.5902986253752567,
+          "fn": 132,
+          "fp": 2461,
+          "precision": 0.4315084315084315,
+          "recall": 0.934,
+          "tn": 1539,
+          "tp": 1868
+        },
+        "classifier_latency_median_seconds": 4.929816,
+        "classifier_latency_p95_seconds": 6.163084,
+        "false_positive_reduction": 0.030475416497358798,
+        "hybrid": {
+          "f1": 0.6248628311647594,
+          "fn": 7,
+          "fp": 2386,
+          "precision": 0.45512674126512903,
+          "recall": 0.9965,
+          "tn": 1614,
+          "tp": 1993
+        },
+        "incremental_outcomes": {
+          "introduced_false_negatives": 0,
+          "introduced_false_positives": 0,
+          "recovered_false_negatives": 125,
+          "suppressed_false_positives": 75
+        },
+        "partition_metrics": {
+          "calibration": {
+            "baseline": {
+              "f1": 0.5930599369085174,
+              "fn": 21,
+              "fp": 495,
+              "precision": 0.4316877152698048,
+              "recall": 0.947103274559194,
+              "tn": 308,
+              "tp": 376
+            },
+            "hybrid": {
+              "f1": 0.6227450980392157,
+              "fn": 0,
+              "fp": 481,
+              "precision": 0.4521640091116173,
+              "recall": 1.0,
+              "tn": 322,
+              "tp": 397
+            },
+            "sample_count": 1200
+          },
+          "holdout": {
+            "baseline": {
+              "f1": 0.5896067970756768,
+              "fn": 111,
+              "fp": 1966,
+              "precision": 0.43146327356853675,
+              "recall": 0.9307548346849657,
+              "tn": 1231,
+              "tp": 1492
+            },
+            "hybrid": {
+              "f1": 0.6253918495297806,
+              "fn": 7,
+              "fp": 1905,
+              "precision": 0.45586975149957154,
+              "recall": 0.9956331877729258,
+              "tn": 1292,
+              "tp": 1596
+            },
+            "sample_count": 4800
+          }
+        },
+        "repeat_exact_agreement": 1.0
+      },
+      "model_endpoints": [
+        "Local model endpoint C (Spark Qwen, calibrated)"
+      ],
+      "model_names": [
+        "qwen3-coder-next"
+      ],
+      "records_sha256": "f1a16795e34cec2df91e56b5a92d64e3ca62e7fb0a8388067fbfdc808e2a0a78"
+    }
+  },
+  "research_phase": "scanner_model_experiment",
+  "scanner_outputs_identical": true,
+  "source_hashes_identical": true,
+  "source_sha256": {
+    "canary_index.json": "be738e6d29c4419e762de99d33f511fc45a0eb732e8bf12080837fe916300861",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "experiment.py": "ce96884291fed85e69660df9f5d4c061582e142a5ed37f5b1b4437829c1f487a",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "b3cf4b9783999f750694e596cd635542ed6ebfcd1a29af7456cdf6d18b089310",
+    "guard.py": "135f7f7a3f4a8fd06a6b380b25b85c27ed76fe74211c1acffbf4636ec25e8205",
+    "operational_corpus.py": "b4c330d716c1eda3be52778d06de7c309224ac13893ff4b83607ac8cf8124752",
+    "scanner_test.py": "38abf4004c434127fd7b5b35dab5fd6587d42744eb54333e9fec860e27c123d9",
+    "semantic.py": "96907527eb3dd560276213f34d1dc1dcab9a1fefda85203fad45d9aeca0c5b32"
+  },
+  "study": "evaluation-v7-operational-model-comparison"
+}

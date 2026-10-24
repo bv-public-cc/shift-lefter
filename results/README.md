@@ -8,6 +8,8 @@ Each published condition contains:
 - `run-summary.json`: versions, hashes, timing, and execution metadata;
 - `analysis.json`: confusion-matrix counts, plain accuracy measures, model errors, and latency;
 - `safety-verification.json`: canary-containment and endpoint-policy checks.
+- `threshold-analysis.json` (v7): calibration-only threshold selection and
+  untouched holdout outcomes derived from sanitized classifier outputs.
 
 ## Where to view the test data
 
@@ -55,3 +57,26 @@ The published bundles are:
 - `sanitized-results/evaluation-v6-independent-context-local-gemma/`;
 - `sanitized-results/evaluation-v6-independent-context-spark-qwen/`;
 - `sanitized-results/evaluation-v6-independent-context-model-comparison.json`.
+
+## Operational holdout v7
+
+The v7 evaluation replaces the earlier shallow synthetic protocol with 6,000
+artifacts grouped into 300 simulated repositories. Sixty repositories (1,200
+artifacts) are reserved for calibration and 240 repositories (4,800 artifacts)
+form an untouched holdout. The corpus covers 16 credential families, 16 safe
+lookalike families, 10 source/configuration/infrastructure/documentation/test
+layouts, and both direct and split runtime assignments. Context is generated
+independently of the label.
+
+The final calibrated Spark Qwen condition uses separate 0.85 detection and
+suppression thresholds. On holdout it recovered 104 scanner false negatives,
+suppressed 61 false positives, and introduced zero false negatives and zero
+false positives. Across the full 6,000 artifacts it recovered 125 and
+suppressed 75. Private-key findings remained non-overridable, and 473 model
+errors fell back to scanner decisions. Median semantic latency was 4.93 seconds
+and p95 latency was 6.16 seconds.
+
+See `V7-OPERATIONAL-RESULTS.md` for the complete per-model results, method,
+hashes, and limitations. The v7 evidence is conclusive for this locked corpus;
+it is credible operational emulation, not a claim that a synthetic corpus
+establishes universal performance on every real repository.

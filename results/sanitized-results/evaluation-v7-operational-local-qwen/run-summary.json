@@ -1,0 +1,40 @@
+{
+  "archived_records_sha256": "03c197052d7f62caad98cb51c7f5c178d69489d62e89ca12e5f855d76427cf25",
+  "classifier_strategy": "batched_semantic_detector",
+  "context_markers_sha256": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+  "duration_seconds": 5862.845,
+  "endpoint_address_redacted_for_publication": true,
+  "execution_source_matches_release": true,
+  "model_endpoints": [
+    "Local model endpoint A (Qwen)"
+  ],
+  "record_count": 12000,
+  "records_sha256": "bb2fe9f81d80e8e1ac919cafbc655716d2a893ee4b0e6bd7f865276c66cbc428",
+  "scanner_versions": {
+    "detect-secrets": "1.5.0",
+    "gitleaks": "8.30.1",
+    "trufflehog": "trufflehog 3.99.1"
+  },
+  "selected_scanners": [
+    "gitleaks",
+    "trufflehog",
+    "detect-secrets"
+  ],
+  "semantic_detection_threshold": 0.9,
+  "semantic_suppression_threshold": 0.9,
+  "source_set": "operational-holdout-v1",
+  "source_sha256": {
+    "canary_index.json": "be738e6d29c4419e762de99d33f511fc45a0eb732e8bf12080837fe916300861",
+    "context_markers.json": "819f82642a17de181e394aedd94857c1dc3438a2874a7a8771a5aaf365419789",
+    "experiment.py": "ce96884291fed85e69660df9f5d4c061582e142a5ed37f5b1b4437829c1f487a",
+    "gitleaks.toml": "8bfa17e8326cf3578e8e07909e34ba325583a14f84f732390f0d657b68d13251",
+    "ground_truth.json": "b3cf4b9783999f750694e596cd635542ed6ebfcd1a29af7456cdf6d18b089310",
+    "guard.py": "135f7f7a3f4a8fd06a6b380b25b85c27ed76fe74211c1acffbf4636ec25e8205",
+    "operational_corpus.py": "b4c330d716c1eda3be52778d06de7c309224ac13893ff4b83607ac8cf8124752",
+    "scanner_test.py": "38abf4004c434127fd7b5b35dab5fd6587d42744eb54333e9fec860e27c123d9",
+    "semantic.py": "96907527eb3dd560276213f34d1dc1dcab9a1fefda85203fad45d9aeca0c5b32"
+  },
+  "study": "evaluation-v7-operational-local-qwen",
+  "worker_count": 8,
+  "worktree_clean": true
+}

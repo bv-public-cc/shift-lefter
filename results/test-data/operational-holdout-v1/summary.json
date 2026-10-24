@@ -1,0 +1,11 @@
+{
+  "calibration_repo_count": 60,
+  "context_label_independent": true,
+  "count": 6000,
+  "holdout_repo_count": 240,
+  "negative_count": 4000,
+  "positive_count": 2000,
+  "protocol_version": "repository-holdout-v1",
+  "repo_count": 300,
+  "repository_grouped_holdout": true
+}

@@ -1,0 +1,116 @@
+{
+  "candidate_thresholds": [
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 21,
+        "hybrid_false_positives": 495,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 0,
+        "model_error_fallbacks": 1,
+        "recovered_false_negatives": 0,
+        "suppressed_false_positives": 0
+      },
+      "threshold": 0.9
+    },
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 18,
+        "hybrid_false_positives": 495,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 0,
+        "model_error_fallbacks": 1,
+        "recovered_false_negatives": 3,
+        "suppressed_false_positives": 0
+      },
+      "threshold": 0.85
+    },
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 18,
+        "hybrid_false_positives": 495,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 0,
+        "model_error_fallbacks": 1,
+        "recovered_false_negatives": 3,
+        "suppressed_false_positives": 0
+      },
+      "threshold": 0.8
+    },
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 18,
+        "hybrid_false_positives": 495,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 0,
+        "model_error_fallbacks": 1,
+        "recovered_false_negatives": 3,
+        "suppressed_false_positives": 0
+      },
+      "threshold": 0.75
+    }
+  ],
+  "inputs": {
+    "ground_truth_sha256": "b3cf4b9783999f750694e596cd635542ed6ebfcd1a29af7456cdf6d18b089310",
+    "records_sha256": "03c197052d7f62caad98cb51c7f5c178d69489d62e89ca12e5f855d76427cf25",
+    "run_summary_sha256": "ff187bf32699be24e4e4c0857147059260b69a19f3afeb82c1ab1ac9a0675257"
+  },
+  "live_detection_threshold": 0.9,
+  "method": "calibration-only threshold freeze with untouched holdout scoring",
+  "privacy": "sanitized classifier outputs only; no source or candidate values read",
+  "schema_version": 1,
+  "selected_detection_threshold": 0.85,
+  "selected_metrics": {
+    "all": {
+      "artifact_count": 6000,
+      "baseline_false_negatives": 132,
+      "baseline_false_positives": 2461,
+      "hybrid_false_negatives": 106,
+      "hybrid_false_positives": 2461,
+      "introduced_false_negatives": 0,
+      "introduced_false_positives": 0,
+      "model_error_fallbacks": 1,
+      "recovered_false_negatives": 26,
+      "suppressed_false_positives": 0
+    },
+    "calibration": {
+      "artifact_count": 1200,
+      "baseline_false_negatives": 21,
+      "baseline_false_positives": 495,
+      "hybrid_false_negatives": 18,
+      "hybrid_false_positives": 495,
+      "introduced_false_negatives": 0,
+      "introduced_false_positives": 0,
+      "model_error_fallbacks": 1,
+      "recovered_false_negatives": 3,
+      "suppressed_false_positives": 0
+    },
+    "holdout": {
+      "artifact_count": 4800,
+      "baseline_false_negatives": 111,
+      "baseline_false_positives": 1966,
+      "hybrid_false_negatives": 88,
+      "hybrid_false_positives": 1966,
+      "introduced_false_negatives": 0,
+      "introduced_false_positives": 0,
+      "model_error_fallbacks": 0,
+      "recovered_false_negatives": 23,
+      "suppressed_false_positives": 0
+    }
+  },
+  "selection_rule": "maximize recovered calibration false negatives subject to zero introduced false positives and false negatives; prefer highest threshold on ties",
+  "source_set": "operational-holdout-v1",
+  "study": "evaluation-v7-operational-local-qwen",
+  "suppression_threshold_unchanged": 0.9
+}

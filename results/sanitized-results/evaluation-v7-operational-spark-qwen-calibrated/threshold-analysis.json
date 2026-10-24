@@ -1,0 +1,101 @@
+{
+  "candidate_thresholds": [
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 0,
+        "hybrid_false_positives": 481,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 0,
+        "model_error_fallbacks": 99,
+        "recovered_false_negatives": 21,
+        "suppressed_false_positives": 14
+      },
+      "threshold": 0.85
+    },
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 0,
+        "hybrid_false_positives": 481,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 0,
+        "model_error_fallbacks": 99,
+        "recovered_false_negatives": 21,
+        "suppressed_false_positives": 14
+      },
+      "threshold": 0.8
+    },
+    {
+      "metrics": {
+        "artifact_count": 1200,
+        "baseline_false_negatives": 21,
+        "baseline_false_positives": 495,
+        "hybrid_false_negatives": 0,
+        "hybrid_false_positives": 551,
+        "introduced_false_negatives": 0,
+        "introduced_false_positives": 70,
+        "model_error_fallbacks": 99,
+        "recovered_false_negatives": 21,
+        "suppressed_false_positives": 14
+      },
+      "threshold": 0.75
+    }
+  ],
+  "inputs": {
+    "ground_truth_sha256": "b3cf4b9783999f750694e596cd635542ed6ebfcd1a29af7456cdf6d18b089310",
+    "records_sha256": "f1a16795e34cec2df91e56b5a92d64e3ca62e7fb0a8388067fbfdc808e2a0a78",
+    "run_summary_sha256": "045aeb0adae3e585db56cb926b0954704d307dad4fde9ec17693a009cabbd8a4"
+  },
+  "live_detection_threshold": 0.85,
+  "method": "calibration-only threshold freeze with untouched holdout scoring",
+  "privacy": "sanitized classifier outputs only; no source or candidate values read",
+  "schema_version": 1,
+  "selected_detection_threshold": 0.85,
+  "selected_metrics": {
+    "all": {
+      "artifact_count": 6000,
+      "baseline_false_negatives": 132,
+      "baseline_false_positives": 2461,
+      "hybrid_false_negatives": 7,
+      "hybrid_false_positives": 2386,
+      "introduced_false_negatives": 0,
+      "introduced_false_positives": 0,
+      "model_error_fallbacks": 473,
+      "recovered_false_negatives": 125,
+      "suppressed_false_positives": 75
+    },
+    "calibration": {
+      "artifact_count": 1200,
+      "baseline_false_negatives": 21,
+      "baseline_false_positives": 495,
+      "hybrid_false_negatives": 0,
+      "hybrid_false_positives": 481,
+      "introduced_false_negatives": 0,
+      "introduced_false_positives": 0,
+      "model_error_fallbacks": 99,
+      "recovered_false_negatives": 21,
+      "suppressed_false_positives": 14
+    },
+    "holdout": {
+      "artifact_count": 4800,
+      "baseline_false_negatives": 111,
+      "baseline_false_positives": 1966,
+      "hybrid_false_negatives": 7,
+      "hybrid_false_positives": 1905,
+      "introduced_false_negatives": 0,
+      "introduced_false_positives": 0,
+      "model_error_fallbacks": 374,
+      "recovered_false_negatives": 104,
+      "suppressed_false_positives": 61
+    }
+  },
+  "selection_rule": "maximize recovered calibration false negatives subject to zero introduced false positives and false negatives; prefer highest threshold on ties",
+  "source_set": "operational-holdout-v1",
+  "study": "evaluation-v7-operational-spark-qwen-calibrated",
+  "suppression_threshold_unchanged": 0.85
+}
