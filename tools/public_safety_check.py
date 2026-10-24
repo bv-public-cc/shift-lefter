@@ -14,14 +14,22 @@ FORBIDDEN = (
     re.compile(r"\bagent[ _-]" + "platform" + r"\b", re.IGNORECASE),
     re.compile(r"glpat-[A-Za-z0-9_-]{10,}"),
 )
+SAFE_SYNTHETIC_LITERALS = ("glpat-EXAMPLE_REPLACE_TOKEN",)
 
 
 def main(root: Path) -> int:
     hits: list[str] = []
     for path in root.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
+        if (
+            not path.is_file()
+            or ".git" in path.parts
+            or "__pycache__" in path.parts
+            or path.suffix in {".pyc", ".pyo"}
+        ):
             continue
         data = path.read_text(encoding="utf-8", errors="ignore")
+        for literal in SAFE_SYNTHETIC_LITERALS:
+            data = data.replace(literal, "[synthetic-placeholder]")
         if any(pattern.search(data) for pattern in FORBIDDEN):
             hits.append(path.as_posix())
     if hits:
