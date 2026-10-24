@@ -177,12 +177,14 @@ def _nonsecret_format(value: str, assignment: str) -> str:
 
 
 def _candidate_value(line: str) -> str | None:
-    quoted = QUOTED_RE.search(line)
-    if quoted:
-        return quoted.group("value")
     token = TOKEN_RE.search(line)
     if token:
         return token.group(0)
+    quoted = [match.group("value") for match in QUOTED_RE.finditer(line)]
+    if quoted:
+        # JSON and nested configuration strings often quote both a key and a
+        # value. Inspect the longest local field, but emit only its features.
+        return max(quoted, key=len)
     if "-----BEGIN PRIVATE KEY-----" in line:
         return "PRIVATE_KEY_MATERIAL"
     if ASSIGNMENT_RE.search(line):

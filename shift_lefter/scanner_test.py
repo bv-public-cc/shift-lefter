@@ -20,7 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import urlparse
 
-from shift_lefter import experiment, guard, semantic
+from shift_lefter import experiment, guard, operational_corpus, semantic
 
 DEFAULT_RESULT_NAME = "evaluation-v2-combined-scanners"
 RESULT_NAME_PATTERN = re.compile(r"evaluation-v[0-9]+-[a-z0-9][a-z0-9-]*$")
@@ -111,6 +111,7 @@ def _execution_manifest(source_commit: str, source_set: str) -> dict:
         "experiment.py": Path(experiment.__file__).resolve(),
         "guard.py": Path(guard.__file__).resolve(),
         "semantic.py": Path(semantic.__file__).resolve(),
+        "operational_corpus.py": Path(operational_corpus.__file__).resolve(),
         "context_markers.json": guard.CONTEXT_MARKERS,
         "gitleaks.toml": experiment.CONFIG,
         "ground_truth.json": raw / "ground_truth.json",
@@ -450,6 +451,33 @@ def analyze(
             else 0.0
         ),
     }
+    partitions = sorted(
+        {
+            record.get("partition")
+            for record in truth.values()
+            if record.get("partition")
+        }
+    )
+    if partitions:
+        summary["partition_metrics"] = {}
+        for partition in partitions:
+            partition_truth = {
+                artifact_id: record
+                for artifact_id, record in truth.items()
+                if record.get("partition") == partition
+            }
+            partition_ids = set(partition_truth)
+            partition_baseline = [
+                row for row in baseline if row["artifact_id"] in partition_ids
+            ]
+            partition_hybrid = [
+                row for row in hybrid if row["artifact_id"] in partition_ids
+            ]
+            summary["partition_metrics"][partition] = {
+                "sample_count": len(partition_truth),
+                "baseline": experiment._metrics(partition_baseline, partition_truth),
+                "hybrid": experiment._metrics(partition_hybrid, partition_truth),
+            }
     experiment._write_json(output_dir / "analysis.json", summary)
     return summary
 
@@ -581,6 +609,8 @@ def compare(
                 "classifier_latency_p95_seconds": analysis[
                     "classifier_latency_p95_seconds"
                 ],
+                "incremental_outcomes": analysis.get("incremental_outcomes", {}),
+                "partition_metrics": analysis.get("partition_metrics", {}),
             },
         }
     result = {

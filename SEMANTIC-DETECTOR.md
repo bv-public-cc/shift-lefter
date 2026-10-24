@@ -39,22 +39,24 @@ allow through error, timeout, malformed JSON, or unsupported evidence.
 
 ## V7 execution
 
-Use a clean committed worktree and the same locked
-`independent-context-evaluation` source set as v6:
+Generate the repository-grouped operational corpus outside Git, then use a
+clean committed worktree:
 
 ```sh
+python -m shift_lefter.operational_corpus --count 6000 --seed 170031
+
 python -m shift_lefter.standalone scanner-test-run \
-  --source-set independent-context-evaluation \
-  --result-name evaluation-v7-semantic-local-qwen \
+  --source-set operational-holdout-v1 \
+  --result-name evaluation-v7-operational-local-qwen \
   --repeats 1 --workers 4 --semantic-batch
 
 python -m shift_lefter.standalone scanner-test-analyze \
-  --source-set independent-context-evaluation \
-  --result-name evaluation-v7-semantic-local-qwen
+  --source-set operational-holdout-v1 \
+  --result-name evaluation-v7-operational-local-qwen
 
 python -m shift_lefter.standalone scanner-test-verify \
-  --source-set independent-context-evaluation \
-  --result-name evaluation-v7-semantic-local-qwen
+  --source-set operational-holdout-v1 \
+  --result-name evaluation-v7-operational-local-qwen
 ```
 
 Repeat with distinct result names for each model, then use
@@ -65,7 +67,16 @@ source hashes.
 
 The analysis reports recovered false negatives, introduced false negatives,
 suppressed false positives, and introduced false positives separately. A
-precision increase is not considered a success if recall falls. Synthetic v7
-results are regression evidence; enabling suppression in enforcement still
-requires an independently sourced, repository-separated holdout with no
-introduced false negatives.
+precision increase is not considered a success if recall falls.
+
+The `operational-holdout-v1` corpus contains 6,000 artifacts distributed across
+300 simulated repositories. It includes sixteen synthetic but structurally
+realistic secret families, sixteen non-secret lookalike families, ten common
+repository layouts, and a repository-grouped 20% calibration/80% holdout split.
+Only the holdout partition supports the final effectiveness result. Raw
+artifacts remain outside Git.
+
+Even this operational emulation cannot prove performance on every real
+repository. Enabling suppression in enforcement still requires an independently
+sourced corpus or production shadow-mode evidence with no introduced false
+negatives.
