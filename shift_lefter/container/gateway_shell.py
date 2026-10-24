@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shlex
@@ -20,13 +21,7 @@ ALLOWED_CONFIG_KEYS = {
     "SHIFT_LEFTER_GITLEAKS",
     "SHIFT_LEFTER_TRUFFLEHOG",
     "SHIFT_LEFTER_DETECT_SECRETS",
-    "SHIFT_LEFTER_STANDALONE",
-    "SHIFT_LEFTER_MODEL_ENDPOINT",
-    "SHIFT_LEFTER_MODEL_NAME",
-    "SHIFT_LEFTER_ALLOWED_MODEL_HOSTS",
-    "SHIFT_LEFTER_ALLOW_PLAINTEXT_MODEL_HOSTS",
-    "SHIFT_LEFTER_CA_BUNDLE",
-    "SHIFT_LEFTER_LOCAL_API_KEY_FILE",
+    "SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST",
     "GIT_SSH_COMMAND",
 }
 
@@ -45,12 +40,36 @@ def _runtime_config() -> dict[str, str]:
     return data
 
 
+def _authenticated_pusher_id() -> str:
+    """Return a content-free identifier bound to OpenSSH's accepted public key."""
+    auth_info = os.environ.get("SSH_USER_AUTH", "")
+    if not auth_info:
+        raise RuntimeError("OpenSSH authentication evidence is unavailable")
+    path = Path(auth_info)
+    data = path.read_text(encoding="utf-8", errors="strict")
+    if len(data) > 16384:
+        raise RuntimeError("OpenSSH authentication evidence is unexpectedly large")
+    public_keys = [
+        line.strip()
+        for line in data.splitlines()
+        if line.strip().startswith("publickey ")
+    ]
+    if len(public_keys) != 1:
+        raise RuntimeError("exactly one public-key identity is required")
+    return "sha256:" + hashlib.sha256(public_keys[0].encode()).hexdigest()
+
+
 def main() -> int:
     config = _runtime_config()
     if not config:
         print("gateway runtime configuration unavailable", file=sys.stderr)
         return 2
     os.environ.update(config)
+    try:
+        os.environ["SHIFT_LEFTER_PUSHER_ID"] = _authenticated_pusher_id()
+    except (OSError, UnicodeError, RuntimeError):
+        print("authenticated pusher identity unavailable", file=sys.stderr)
+        return 2
     project = config.get("SHIFT_LEFTER_PROJECT_NAME", "")
     original = os.environ.get("SSH_ORIGINAL_COMMAND", "")
     try:

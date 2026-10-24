@@ -56,10 +56,12 @@ def test_generator_keeps_balanced_channels_and_expected_labels(tmp_path, monkeyp
     }
 
 
-def test_expanded_generator_has_3000_diverse_labeled_artifacts(tmp_path, monkeypatch):
+def test_independent_context_generator_has_balanced_unlabeled_context(
+    tmp_path, monkeypatch
+):
     monkeypatch.setenv("SHIFT_LEFTER_ROOT", str(tmp_path / "outside-git"))
-    result = generate(experiment.EXPANDED_SET, 3000, 83017)
-    raw = tmp_path / "outside-git/raw" / experiment.EXPANDED_SET
+    result = generate(experiment.INDEPENDENT_CONTEXT_SET, 3000, 83017)
+    raw = tmp_path / "outside-git/raw" / experiment.INDEPENDENT_CONTEXT_SET
     manifest = json.loads((raw / "ground_truth.json").read_text())
 
     assert result["count"] == 3000
@@ -68,6 +70,29 @@ def test_expanded_generator_has_3000_diverse_labeled_artifacts(tmp_path, monkeyp
     assert len({row["category"] for row in manifest["records"]}) >= 15
     assert {row["channel"] for row in manifest["records"]} == set(experiment.CHANNELS)
     assert len(list((raw / "artifacts").iterdir())) == 3000
+    assert manifest["protocol_version"] == "independent-context-v1"
+    assert manifest["context_label_independent"] is True
+    for label in (0, 1):
+        for channel in experiment.CHANNELS:
+            variants = {
+                row["context_variant"]
+                for row in manifest["records"]
+                if row["label"] == label
+                and row["channel"] == channel
+                and "context_variant" in row
+            }
+            assert variants == {0, 1, 2, 3}
+    rendered = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted((raw / "artifacts").iterdir())
+    ).lower()
+    for leaked_label in (
+        "active runtime credential",
+        "nonfunctional documentation example",
+        "placeholder value that must be replaced",
+        "review this safe fictional example",
+    ):
+        assert leaked_label not in rendered
 
 
 def test_generator_refuses_git_worktree(tmp_path, monkeypatch):

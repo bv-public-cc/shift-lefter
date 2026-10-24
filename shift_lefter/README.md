@@ -98,27 +98,31 @@ export SHIFT_LEFTER_DETECT_SECRETS="$(pwd)/.venv/bin/detect-secrets"
 After installation, developers continue to use ordinary `git add`, `git commit`,
 and `git push` commands:
 
-1. A required clean filter checks text before Git accepts a blob during
+1. A required clean filter checks every blob, including NUL-containing input,
+   before Git accepts it during
    `git add`. An `allow` result streams the original bytes unchanged. A
    `review` or `block` result emits no bytes and makes `git add` fail.
 2. A pre-commit hook scans the exact staged blobs, not potentially different
    working-tree files.
-3. A pre-push hook scans the changed blobs in the outgoing commit range.
+3. A pre-push hook scans all new objects in the outgoing commit range,
+   including intermediate blobs and commit/tag messages.
 
-The same scanner/policy engine is used in both modes. The deterministic scanners
-discover candidates. Candidate values are replaced with hash-tagged redactions;
-the candidate line and nearby source are projected into allowlisted semantic
-markers and structural features before reaching the allowlisted local model. Scanner
-reports are parsed in memory and raw-object copies use ephemeral storage. Raw
-source, raw values, prompts, and scanner reports are never durably logged. Missing
-scanners, local-model errors, and unknown outcomes fail closed as `review`.
+The enforcement path is scanner-only and strict. Scanner reports are parsed in
+memory and raw-object copies use ephemeral storage. Raw source, raw values, and
+scanner reports are never durably logged. Missing scanners and unknown outcomes
+fail closed as `review`. The contextual model is isolated in the experiment
+runner and is not consulted by `git add`, hooks, or the gateway.
 
-The gateway and workstation controls default to `SHIFT_LEFTER_POLICY_MODE=strict`.
-In that mode, any scanner finding is held even when the model recommends
-`allow`; the model still classifies and explains the candidate for review.
-`contextual` mode permits a high-confidence model allow and exists for controlled
-evaluation. Promote it to enforcement only after representative testing shows
-that its recall and false-negative thresholds are acceptable.
+The gateway and workstation controls require
+`SHIFT_LEFTER_POLICY_MODE=strict`. Any other value fails closed. Contextual
+model decisions exist only as measured research conditions and cannot clear an
+enforcement finding.
+
+Confirmed false positives use an administrator-managed, expiring exception file
+outside Git. Entries bind the exact artifact SHA-256 to the exact sorted
+`scanner:rule` set and a review ticket. Invalid, stale, or changed entries fail
+closed, and private-key findings cannot be excepted. The schema is documented in
+`REVIEW-REMEDIATIONS.md`.
 
 The gate deliberately does not rewrite a credential into a guessed placeholder.
 Silent source rewriting can corrupt code or hide a credential that must be
@@ -127,5 +131,6 @@ developer to replace the value with a Vault reference or an explicit safe
 placeholder. This keeps the normal Git workflow transparent without making an
 unsafe source-code decision on the developer's behalf.
 
-The locked evaluation uses 300 artifacts and three hybrid repetitions. Do not
-generate or run it until the pilot passes and the protocol is frozen.
+The historical evaluations remain archived. New runs use the separately named
+`independent-context-evaluation` protocol described in
+`REVIEW-REMEDIATIONS.md`; do not combine its results with the v4/v5 archive.

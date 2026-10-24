@@ -16,4 +16,5 @@ PermitTunnel no
 GatewayPorts no
 PermitTTY no
 ForceCommand /usr/local/bin/shift-lefter-gateway-shell
+ExposeAuthInfo yes
 Subsystem sftp internal-sftp

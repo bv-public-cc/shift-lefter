@@ -5,42 +5,34 @@
 Run the decision engine in a front-door bare Git gateway rather than in every developer clone. Developers use their ordinary `git commit` and `git push` commands. Their local commit already exists; a server-side control cannot intervene in `git add` or `git commit`. The gateway prevents a rejected transaction from making an authoritative upstream ref reachable or triggering the Git host's CI, pull-request, or merge-request consumers.
 
 Git receives proposed objects into a quarantine directory before invoking `pre-receive`. The gateway scans every object newly reachable from all proposed tips, including intermediate-history blobs and human-authored commit or annotated-tag messages. A secret added in one commit and removed in a later commit is still evaluated.
- 
-```mermaid
-flowchart TD
-    A["Developer Git Push"] --> B["SSH Receive Gateway"]
-    B --> C["Unreachable Git Quarantine"]
 
-    C --> D["Gitleaks<br/>Standard + Research Rules"]
-    C --> E["TruffleHog"]
-    C --> F["detect-secrets"]
-
-    D --> G["Normalized Candidates"]
-    E --> G
-    F --> G
-
-    G --> H["Structured / Redacted Prompt"]
-    H --> I["Local LLM"]
-    I --> J{"Deterministic Fail-Closed Policy"}
-
-    J -->|ALLOW| K["Durable Forward Intent"]
-    K --> L["Atomic Leased Push to Git Host"]
-
-    J -->|REVIEW / BLOCK| M["Reject Transaction"]
-    M --> N["Discard Quarantine"]
-
-    style A fill:#e3f2fd,stroke:#1565c0,color:#000
-    style C fill:#fff3e0,stroke:#ef6c00,color:#000
-    style G fill:#e3f2fd,stroke:#1565c0,color:#000
-    style I fill:#ede7f6,stroke:#673ab7,color:#000
-    style J fill:#fff3e0,stroke:#ef6c00,color:#000
-    style L fill:#e8f5e9,stroke:#2e7d32,color:#000
-    style N fill:#ffebee,stroke:#c62828,color:#000
+```text
+developer git push
+        |
+        v
+SSH receive gateway
+        |
+        v
+unreachable Git quarantine
+        |
+        +--> Gitleaks (standard + research rules) --+
+        +--> TruffleHog ----------------------------+--> normalized candidates
+        +--> detect-secrets ------------------------+
+                                                       |
+                                                       v
+                                           strict fail-closed policy
+                                             |                    |
+                                          ALLOW              REVIEW/BLOCK
+                                             |                    |
+                                    durable forward intent   reject transaction;
+                                    atomic leased push       discard quarantine
+                                    to Git host
 ```
 
-The model participates in candidate classification. It receives scanner/rule metadata, file type, candidate-line redactions, allowlisted semantic markers, and structural features. It never receives a raw source line or candidate value. The model cannot override private-key hard blocks. Scanner failures, model failures, malformed responses, ambiguity, and low confidence all reject the receive transaction.
-
-The reference gateway defaults to strict policy. A scanner finding remains a hold even when the model recommends `allow`; the recommendation supplies review context but cannot clear the push. The separately measured `contextual` mode permits a high-confidence model allow and must be enabled explicitly with `SHIFT_LEFTER_POLICY_MODE=contextual`. Do not use that mode for enforcement until evaluation on representative repositories meets an approved false-negative threshold.
+The reference gateway is scanner-only and requires strict policy. Every scanner
+finding is held. The contextual model is an experiment-runner condition and is
+not invoked by gateway, hook, or clean-filter enforcement. Any attempted
+non-strict enforcement configuration fails closed.
 
 ## Atomic forwarding and audit order
 
@@ -48,7 +40,10 @@ The gateway validates the exact upstream hostname, rejects credentials embedded 
 
 If scanning, intent persistence, or forwarding fails, the gateway returns nonzero and its own receive transaction is rejected. If the upstream accepts the atomic push but the completion audit append then fails, the gateway returns success: reporting rejection would contradict authoritative upstream state and could cause an unsafe retry. The durable intent record marks the transaction for reconciliation.
 
-Audit records contain an event hash, verdict, reason code, counts, and hashed ref names. They do not contain source bytes, filenames, raw scanner output, prompts, completions, or exception messages.
+Audit records contain an event hash, verdict, reason code, counts, hashed ref
+names, and a content-free pusher identifier derived from OpenSSH's accepted
+public-key authentication record. They do not contain source bytes, filenames,
+raw scanner output, raw keys, prompts, completions, or exception messages.
 
 ## Reference container
 
@@ -69,14 +64,13 @@ Runtime configuration:
 SHIFT_LEFTER_PROJECT_NAME
 SHIFT_LEFTER_UPSTREAM_URL
 SHIFT_LEFTER_UPSTREAM_HOST
-SHIFT_LEFTER_MODEL_ENDPOINT
-SHIFT_LEFTER_MODEL_NAME
-SHIFT_LEFTER_ALLOWED_MODEL_HOSTS
-SHIFT_LEFTER_CA_BUNDLE
-SHIFT_LEFTER_LOCAL_API_KEY_FILE or SHIFT_LEFTER_LOCAL_API_KEY_ENV
+SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST (optional, mounted read-only)
 ```
 
-Mount authorized keys, a project-scoped upstream SSH credential, strict known-hosts configuration, the internal CA bundle, persistent gateway/audit volumes, and persistent SSH host private keys at `/run/secrets/ssh_host_ed25519_key` and `/run/secrets/ssh_host_rsa_key`. Generate those host keys once outside the container, protect them as deployment secrets, and preserve them across image upgrades. The container deliberately refuses to start without them. Rotating a host key is a managed security event because developer clients will reject an unannounced replacement. Network policy should deny general egress and permit only the configured Git host and local-model destinations.
+Model configuration is needed by the experiment runner, not by gateway
+enforcement.
+
+Mount authorized keys, a project-scoped upstream SSH credential, strict known-hosts configuration, persistent gateway/audit volumes, and persistent SSH host private keys at `/run/secrets/ssh_host_ed25519_key` and `/run/secrets/ssh_host_rsa_key`. Generate those host keys once outside the container, protect them as deployment secrets, and preserve them across image upgrades. The container deliberately refuses to start without them. Rotating a host key is a managed security event because developer clients will reject an unannounced replacement. OpenSSH authentication evidence is required and hashed before the receive command runs. Network policy should deny general egress and permit only the configured Git host.
 
 ## Hosted GitHub upstream
 
@@ -98,7 +92,7 @@ Git LFS uploads use a separate HTTP object path; the receive gateway sees only p
 
 The parser currently expects 40-character SHA-1 object IDs. SHA-256-format repositories require separate compatibility work. Repository-scale latency, very large blobs, long histories, concurrent pushes, and resource-exhaustion behavior require load tests before production.
 
-The gateway is transparent to the developer's commands, not invisible to platform engineering. Managed clone URLs or DNS must direct pushes to it. Because upstream pushes use a service credential, the gateway audit must bind each authenticated developer key to the transaction so accountability is preserved.
+The gateway is transparent to the developer's commands, not invisible to platform engineering. Managed clone URLs or DNS must direct pushes to it. Because upstream pushes use a service credential, the gateway hashes the accepted developer public-key authentication record and binds that identifier to every audit event. The upstream Git host still sees the gateway service identity rather than the original pusher.
 
 ## Rollout
 

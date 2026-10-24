@@ -41,8 +41,7 @@ ENV PYTHONPATH=/opt/shift-lefter \
     SHIFT_LEFTER_GITLEAKS=/usr/local/bin/gitleaks \
     SHIFT_LEFTER_TRUFFLEHOG=/usr/local/bin/trufflehog \
     SHIFT_LEFTER_DETECT_SECRETS=/usr/local/bin/detect-secrets \
-    SHIFT_LEFTER_POLICY_MODE=strict \
-    SHIFT_LEFTER_STANDALONE=1
+    SHIFT_LEFTER_POLICY_MODE=strict
 
 EXPOSE 2222
 VOLUME ["/srv/git", "/srv/evidence"]

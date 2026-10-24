@@ -8,6 +8,7 @@ content-free findings are returned or logged.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import hashlib
 import json
 import os
@@ -31,6 +32,63 @@ CONTEXT_MARKERS = Path(__file__).with_name("context_markers.json")
 
 def _digest(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8", errors="replace")).hexdigest()
+
+
+def _approved_false_positive(scanned: dict) -> bool:
+    """Match an expiring, content-addressed exception stored outside Git."""
+    configured = os.environ.get("SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST")
+    if not configured:
+        return False
+    path = Path(configured).expanduser().resolve()
+    experiment._assert_outside_git(path)
+    if not path.is_file():
+        raise RuntimeError("false-positive exception file is unavailable")
+    if os.name == "posix" and path.stat().st_mode & 0o022:
+        raise RuntimeError("false-positive exception file must not be group/world writable")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if (
+        set(payload) != {"schema_version", "entries"}
+        or payload["schema_version"] != 1
+    ):
+        raise ValueError("false-positive exception schema is invalid")
+    if not isinstance(payload["entries"], list):
+        raise ValueError("false-positive exception entries must be a list")
+    finding_keys = sorted(
+        {f"{item['scanner']}:{item['rule_id']}" for item in scanned["findings"]}
+    )
+    now = dt.datetime.now(dt.timezone.utc)
+    for entry in payload["entries"]:
+        if set(entry) != {
+            "artifact_sha256",
+            "finding_keys",
+            "expires_utc",
+            "ticket",
+        }:
+            raise ValueError("false-positive exception entry is invalid")
+        if not isinstance(entry["ticket"], str) or not entry["ticket"].strip():
+            raise ValueError("false-positive exception ticket is required")
+        if not isinstance(entry["artifact_sha256"], str) or not re.fullmatch(
+            r"[0-9a-f]{64}", entry["artifact_sha256"]
+        ):
+            raise ValueError("false-positive exception artifact hash is invalid")
+        if (
+            not isinstance(entry["finding_keys"], list)
+            or not all(isinstance(item, str) and item for item in entry["finding_keys"])
+            or entry["finding_keys"] != sorted(set(entry["finding_keys"]))
+        ):
+            raise ValueError("false-positive exception finding keys are invalid")
+        if not isinstance(entry["expires_utc"], str):
+            raise ValueError("false-positive exception expiry is invalid")
+        expires = dt.datetime.fromisoformat(entry["expires_utc"].replace("Z", "+00:00"))
+        if expires.tzinfo is None:
+            raise ValueError("false-positive exception expiry must include a timezone")
+        if (
+            entry["artifact_sha256"] == scanned["artifact_sha256"]
+            and entry["finding_keys"] == finding_keys
+            and expires > now
+        ):
+            return True
+    return False
 
 
 def _transient_root() -> Path:
@@ -254,6 +312,11 @@ def _redacted_context(
         if stripped.startswith("# "):
             structures.append("heading_or_comment")
         if position + 1 in lines_to_redact:
+            # Do not derive semantic markers from the candidate line. Besides
+            # leaking synthetic placeholder labels, an attacker could append a
+            # word such as "example" to a live credential and influence a
+            # contextual research decision.
+            markers = []
             digest = _digest(lines[position])[:12]
             rendered.append(
                 f"{position + 1}: <REDACTED_CANDIDATE sha256={digest}>;"
@@ -419,27 +482,50 @@ def scan_file(path: Path, scanners: Iterable[str] = DEFAULT_SCANNERS) -> dict:
     path = path.expanduser().resolve()
     scanned = scan_candidates(path, scanners)
     findings = scanned["findings"]
-    classifications = []
-    if not scanned["scanner_errors"]:
-        for finding in classification_targets(findings):
-            try:
-                result, _seconds, _model, _endpoint = classify_redacted(path, finding)
-                classifications.append(result)
-            except Exception as exc:
-                classifications.append({"error": type(exc).__name__})
+    policy_mode = os.environ.get("SHIFT_LEFTER_POLICY_MODE", "strict")
+    if policy_mode != "strict":
+        return {
+            **scanned,
+            "verdict": "review",
+            "reason_code": "enforcement_requires_strict_policy",
+            "finding_count": len(findings),
+            "policy_mode": policy_mode,
+        }
+    hard_block = any(
+        "private" in item["rule_id"].lower() and "key" in item["rule_id"].lower()
+        for item in findings
+    )
+    if findings and not scanned["scanner_errors"] and not hard_block:
+        try:
+            if _approved_false_positive(scanned):
+                return {
+                    **scanned,
+                    "verdict": "allow",
+                    "reason_code": "approved_false_positive_exception",
+                    "finding_count": len(findings),
+                    "policy_mode": "strict",
+                }
+        except Exception as exc:
+            return {
+                **scanned,
+                "verdict": "review",
+                "reason_code": "false_positive_exception_error_fail_closed",
+                "finding_count": len(findings),
+                "policy_mode": "strict",
+                "exception_error_type": type(exc).__name__,
+            }
     verdict, reason = decide_findings(
         findings,
-        classifications,
+        [],
         scanned["scanner_errors"],
-        allow_classifier_allow=(
-            os.environ.get("SHIFT_LEFTER_POLICY_MODE", "strict") == "contextual"
-        ),
+        allow_classifier_allow=False,
     )
     return {
         **scanned,
         "verdict": verdict,
         "reason_code": reason,
         "finding_count": len(findings),
+        "policy_mode": "strict",
     }
 
 
@@ -483,14 +569,24 @@ def _scan_git_blobs(repo: Path, revision: str, names: Iterable[str]) -> list[dic
     return results
 
 
-def _new_reachable_objects(
-    repo: Path, new_shas: Iterable[str]
+def _reachable_objects(
+    repo: Path,
+    new_shas: Iterable[str],
+    excluded_shas: Iterable[str] = (),
+    *,
+    exclude_all_refs: bool = False,
 ) -> list[tuple[str, str]]:
-    """List objects reachable from proposed tips but not from current refs."""
+    """List objects reachable from tips after applying explicit exclusions."""
     tips = sorted({sha for sha in new_shas if sha != ZERO_SHA})
     if not tips:
         return []
-    output = _git(repo, "rev-list", "--objects", *tips, "--not", "--all")
+    command = ["rev-list", "--objects", *tips]
+    excluded = sorted({sha for sha in excluded_shas if sha != ZERO_SHA})
+    if exclude_all_refs:
+        command.extend(("--not", "--all"))
+    elif excluded:
+        command.extend(("--not", *excluded))
+    output = _git(repo, *command)
     objects: dict[str, str] = {}
     for raw_line in output.splitlines():
         fields = raw_line.decode("utf-8", errors="surrogateescape").split(" ", 1)
@@ -502,10 +598,19 @@ def _new_reachable_objects(
     return sorted(objects.items())
 
 
-def _scan_new_reachable_objects(repo: Path, new_shas: Iterable[str]) -> list[dict]:
-    """Scan new blobs and the text of new commit or annotated-tag objects."""
+def _new_reachable_objects(
+    repo: Path, new_shas: Iterable[str]
+) -> list[tuple[str, str]]:
+    """List objects reachable from proposed tips but not from current refs."""
+    return _reachable_objects(repo, new_shas, exclude_all_refs=True)
+
+
+def _scan_reachable_objects(
+    repo: Path, objects: Iterable[tuple[str, str]]
+) -> list[dict]:
+    """Scan blobs and human-authored text from the supplied Git objects."""
     results = []
-    for object_id, object_name in _new_reachable_objects(repo, new_shas):
+    for object_id, object_name in objects:
         object_type = _git(repo, "cat-file", "-t", object_id).decode().strip()
         if object_type == "tree":
             continue
@@ -525,6 +630,11 @@ def _scan_new_reachable_objects(repo: Path, new_shas: Iterable[str]) -> list[dic
         if result:
             results.append(result)
     return results
+
+
+def _scan_new_reachable_objects(repo: Path, new_shas: Iterable[str]) -> list[dict]:
+    """Scan new blobs and the text of new commit or annotated-tag objects."""
+    return _scan_reachable_objects(repo, _new_reachable_objects(repo, new_shas))
 
 
 def scan_staged(repo: Path) -> list[dict]:
@@ -552,7 +662,8 @@ def _changed_names(repo: Path, old_sha: str, new_sha: str) -> list[str]:
 
 
 def scan_push(repo: Path, lines: Iterable[str]) -> list[dict]:
-    revisions: dict[str, set[str]] = {}
+    new_shas = []
+    old_shas = []
     for line in lines:
         fields = line.split()
         if len(fields) != 4:
@@ -560,13 +671,11 @@ def scan_push(repo: Path, lines: Iterable[str]) -> list[dict]:
         _local_ref, local_sha, _remote_ref, remote_sha = fields
         if local_sha == ZERO_SHA:
             continue
-        revisions.setdefault(local_sha, set()).update(
-            _changed_names(repo, remote_sha, local_sha)
-        )
-    results = []
-    for revision, names in revisions.items():
-        results.extend(_scan_git_blobs(repo, revision, sorted(names)))
-    return results
+        new_shas.append(local_sha)
+        if remote_sha != ZERO_SHA:
+            old_shas.append(remote_sha)
+    objects = _reachable_objects(repo, new_shas, old_shas)
+    return _scan_reachable_objects(repo, objects)
 
 
 def scan_receive(repo: Path, lines: Iterable[str]) -> list[dict]:
@@ -606,9 +715,6 @@ def _print_rejections(stage: str, results: list[dict]) -> None:
 
 def filter_clean(path_hint: str) -> int:
     data = sys.stdin.buffer.read()
-    if b"\0" in data[:8192]:
-        sys.stdout.buffer.write(data)
-        return 0
     transient_root = _transient_root()
     fd, temp_name = tempfile.mkstemp(
         prefix="clean-", suffix=Path(path_hint).suffix, dir=transient_root

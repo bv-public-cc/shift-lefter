@@ -129,7 +129,12 @@ def main(argv: list[str] | None = None) -> int:
     generate.add_argument(
         "--set",
         required=True,
-        choices=("pilot", "evaluation", experiment.EXPANDED_SET),
+        choices=(
+            "pilot",
+            "evaluation",
+            experiment.EXPANDED_SET,
+            experiment.INDEPENDENT_CONTEXT_SET,
+        ),
     )
     generate.add_argument("--count", required=True, type=int)
     generate.add_argument("--seed", required=True, type=int)

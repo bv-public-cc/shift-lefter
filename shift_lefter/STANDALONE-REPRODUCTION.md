@@ -4,7 +4,8 @@ This guide reproduces the Shift Lefter three-scanner experiment and exercises th
 
 ## 1. What this protocol reproduces
 
-The recommended protocol is the corrected, separately versioned `evaluation-v4-combined-scanners-3000` study:
+The recommended protocol is the separately versioned
+`evaluation-v6-independent-context` study:
 
 - the same frozen 3,000-item synthetic test dataset for every condition: 1,000 planted secret cases and 2,000 safe cases;
 - five file channels and fifteen secret, false-positive, and clean-control categories;
@@ -19,7 +20,7 @@ The recommended protocol is the corrected, separately versioned `evaluation-v4-c
 - four bounded workers, with output written in deterministic test-manifest order;
 - separate result sets for each model and a comparison that refuses unequal scanner inputs or source hashes.
 
-The original locked Gitleaks-only study and the 300-item v2 combined-scanner test remain archival results. The original study's bounded prompt included raw synthetic source context. The 3,000-item v3 execution is retained as defect-discovery evidence: it exposed scanner misses, unsafe contextual downgrades, and an unauthenticated model condition. Do not describe the original protocol as fully redacted or pool statistics across these versions.
+The original locked Gitleaks-only study and the 300-item v2 combined-scanner test remain archival results. The original study's bounded prompt included raw synthetic source context. The 3,000-item v3 execution is retained as defect-discovery evidence: it exposed scanner misses, unsafe contextual downgrades, and an unauthenticated model condition. The v4/v5 `expanded-evaluation` corpus also contains label-correlated context vocabulary. Do not describe these protocols as independent validation or pool statistics across versions. New executions use `independent-context-evaluation` and v6 result names as specified in `REVIEW-REMEDIATIONS.md`.
 
 ## 2. Security boundary
 
@@ -44,6 +45,7 @@ Clone the repository or copy the top-level `shift_lefter/` package and retain:
 ```text
 shift_lefter/__init__.py
 shift_lefter/context_markers.json
+REVIEW-REMEDIATIONS.md
 shift_lefter/scanner_test.py
 shift_lefter/experiment.py
 shift_lefter/gateway.py
@@ -86,7 +88,7 @@ git rev-parse HEAD
 git status --porcelain --untracked-files=no
 ```
 
-The combined-scanner runner refuses a tracked dirty worktree and refuses to overwrite an existing result set. It explicitly measures contextual model allows. Gateway and workstation enforcement default to strict policy, where a scanner finding remains held even when the classifier recommends `allow`.
+The combined-scanner runner refuses a tracked dirty worktree and refuses to overwrite an existing result set. It explicitly measures contextual model allows. Gateway and workstation enforcement are scanner-only, require strict policy, and do not invoke the model.
 
 ## 5. Generate and lock the test dataset
 
@@ -94,16 +96,16 @@ Use a new empty research root. Generation refuses to overwrite an existing raw s
 
 ```bash
 .venv/bin/python -m shift_lefter.standalone \
-  generate --set expanded-evaluation --count 3000 --seed 83017
+  generate --set independent-context-evaluation --count 3000 --seed 83017
 ```
 
 Keep these files inside the protected raw root:
 
 ```text
-$SHIFT_LEFTER_ROOT/raw/expanded-evaluation/artifacts/
-$SHIFT_LEFTER_ROOT/raw/expanded-evaluation/ground_truth.json
-$SHIFT_LEFTER_ROOT/raw/expanded-evaluation/canary_index.json
-$SHIFT_LEFTER_ROOT/raw/expanded-evaluation/lock.json
+$SHIFT_LEFTER_ROOT/raw/independent-context-evaluation/artifacts/
+$SHIFT_LEFTER_ROOT/raw/independent-context-evaluation/ground_truth.json
+$SHIFT_LEFTER_ROOT/raw/independent-context-evaluation/canary_index.json
+$SHIFT_LEFTER_ROOT/raw/independent-context-evaluation/lock.json
 ```
 
 Record SHA-256 hashes for `ground_truth.json`, `canary_index.json`, `gitleaks.toml`, `guard.py`, `scanner_test.py`, and `context_markers.json`. The runner records these again in each condition's `run-summary.json`.
@@ -149,15 +151,15 @@ Do not set both key mechanisms. Never print the key, include it in a URL, or sto
 Choose a unique slug containing the protocol version and model label:
 
 ```bash
-RESULT_NAME="evaluation-v4-combined-scanners-3000-local-model-a"
+RESULT_NAME="evaluation-v6-independent-context-local-model-a"
 
 .venv/bin/python -m shift_lefter.standalone \
-  scanner-test-run --source-set expanded-evaluation --repeats 1 --workers 4 \
+  scanner-test-run --source-set independent-context-evaluation --repeats 1 --workers 4 \
   --result-name "$RESULT_NAME"
 .venv/bin/python -m shift_lefter.standalone \
-  scanner-test-analyze --source-set expanded-evaluation --result-name "$RESULT_NAME"
+  scanner-test-analyze --source-set independent-context-evaluation --result-name "$RESULT_NAME"
 .venv/bin/python -m shift_lefter.standalone \
-  scanner-test-verify --source-set expanded-evaluation --result-name "$RESULT_NAME"
+  scanner-test-verify --source-set independent-context-evaluation --result-name "$RESULT_NAME"
 ```
 
 Do not proceed if verification exits nonzero, any scanner is unavailable, the endpoint is absent or outside the local allowlist, the result cardinality differs from ground truth, or a raw canary exists outside `$SHIFT_LEFTER_ROOT/raw`.
@@ -170,16 +172,16 @@ After every condition has an `analysis.json` and passing `safety-verification.js
 
 ```bash
 .venv/bin/python -m shift_lefter.scanner_test compare \
-  --result-name evaluation-v4-combined-scanners-3000-local-model-a \
-  --result-name evaluation-v4-combined-scanners-3000-local-model-b \
-  --result-name evaluation-v4-combined-scanners-3000-local-model-c \
-  --output-name evaluation-v4-combined-scanners-3000-model-comparison
+  --result-name evaluation-v6-independent-context-local-model-a \
+  --result-name evaluation-v6-independent-context-local-model-b \
+  --result-name evaluation-v6-independent-context-local-model-c \
+  --output-name evaluation-v6-independent-context-model-comparison
 ```
 
 The command fails if scanner findings differ, source hashes differ, a condition lacks passing safety evidence, or result names are duplicated. It writes:
 
 ```text
-$SHIFT_LEFTER_ROOT/sanitized-results/evaluation-v4-combined-scanners-3000-model-comparison.json
+$SHIFT_LEFTER_ROOT/sanitized-results/evaluation-v6-independent-context-model-comparison.json
 ```
 
 Report each model separately. Do not select the best model after inspection and present it as a preregistered result. This comparison is part of the same research program.
@@ -190,7 +192,7 @@ After the corrected combined-scanner conditions pass verification, repeat the te
 
 ```bash
 .venv/bin/python -m shift_lefter.standalone scanner-test-run \
-  --source-set expanded-evaluation --repeats 1 --workers 4 \
+  --source-set independent-context-evaluation --repeats 1 --workers 4 \
   --scanner gitleaks \
   --result-name evaluation-v5-gitleaks-local-model-a
 ```
@@ -245,7 +247,7 @@ Test at minimum:
 6. multi-ref forwarding is atomic;
 7. audit storage failure before forwarding rejects without contacting upstream.
 
-The reference container provides SSH for one mapped repository. It is not a complete Git-host replacement: smart HTTP, original pusher identity, push options, signed-push metadata, dynamic authorization, LFS payload scanning, load testing, and high availability remain production integration work. GitLab was the tested upstream. A GitHub deployment needs a separately validated GitHub App or repository-scoped write credential plus rules that prevent developers from bypassing the gateway.
+The reference container provides SSH for one mapped repository. It hashes the accepted developer public-key record into each audit event, while the upstream still sees the gateway service identity. It is not a complete Git-host replacement: smart HTTP, upstream pusher-identity preservation, push options, signed-push metadata, dynamic authorization, LFS payload scanning, load testing, and high availability remain production integration work. GitLab was the tested upstream. A GitHub deployment needs a separately validated GitHub App or repository-scoped write credential plus rules that prevent developers from bypassing the gateway.
 
 ## 11. Publishable artifacts
 
@@ -256,7 +258,7 @@ $SHIFT_LEFTER_ROOT/sanitized-results/<condition>/records.jsonl
 $SHIFT_LEFTER_ROOT/sanitized-results/<condition>/run-summary.json
 $SHIFT_LEFTER_ROOT/sanitized-results/<condition>/analysis.json
 $SHIFT_LEFTER_ROOT/sanitized-results/<condition>/safety-verification.json
-$SHIFT_LEFTER_ROOT/sanitized-results/evaluation-v4-combined-scanners-3000-model-comparison.json
+$SHIFT_LEFTER_ROOT/sanitized-results/evaluation-v6-independent-context-model-comparison.json
 ```
 
 Preserve exact hashes, scanner versions, endpoint labels, model identifiers, execution commit, test output, and all deviations. A model identifier is not a cryptographic weight hash; if exact weights cannot be hashed, state that limitation.

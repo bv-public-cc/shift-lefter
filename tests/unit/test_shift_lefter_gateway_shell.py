@@ -23,6 +23,9 @@ def test_gateway_shell_allows_only_configured_repository(monkeypatch):
     )
     monkeypatch.setenv("SSH_ORIGINAL_COMMAND", "git-receive-pack 'project.git'")
     monkeypatch.setattr(
+        gateway_shell, "_authenticated_pusher_id", lambda: "sha256:test-pusher"
+    )
+    monkeypatch.setattr(
         gateway_shell.os,
         "execvp",
         lambda executable, args: executed.append((executable, args)),
@@ -39,6 +42,9 @@ def test_gateway_shell_rejects_traversal_and_arbitrary_commands(monkeypatch):
         gateway_shell,
         "_runtime_config",
         lambda: {"SHIFT_LEFTER_PROJECT_NAME": "project"},
+    )
+    monkeypatch.setattr(
+        gateway_shell, "_authenticated_pusher_id", lambda: "sha256:test-pusher"
     )
     for command in (
         "git-receive-pack '../project.git'",
@@ -66,3 +72,31 @@ def test_runtime_config_rejects_unknown_or_nonstr_config(tmp_path, monkeypatch):
         encoding="utf-8",
     )
     assert gateway_shell._runtime_config() == {}
+
+
+def test_authenticated_pusher_id_hashes_openssh_public_key_record(tmp_path, monkeypatch):
+    auth_info = tmp_path / "sshauth"
+    auth_info.write_text(
+        "publickey ssh-ed25519 SHA256:developer-key-fingerprint\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("SSH_USER_AUTH", str(auth_info))
+
+    first = gateway_shell._authenticated_pusher_id()
+    second = gateway_shell._authenticated_pusher_id()
+
+    assert first == second
+    assert first.startswith("sha256:")
+    assert "developer-key-fingerprint" not in first
+
+
+def test_gateway_shell_fails_closed_without_authentication_evidence(monkeypatch):
+    monkeypatch.setattr(
+        gateway_shell,
+        "_runtime_config",
+        lambda: {"SHIFT_LEFTER_PROJECT_NAME": "project"},
+    )
+    monkeypatch.delenv("SSH_USER_AUTH", raising=False)
+    monkeypatch.setenv("SSH_ORIGINAL_COMMAND", "git-receive-pack 'project.git'")
+
+    assert gateway_shell.main() == 2

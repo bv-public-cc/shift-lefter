@@ -137,7 +137,7 @@ def test_redacted_context_never_contains_candidate(tmp_path):
     assert "markers=runtime" in context
 
 
-def test_redacted_candidate_line_retains_only_allowlisted_features(tmp_path):
+def test_redacted_candidate_line_does_not_project_attacker_controlled_markers(tmp_path):
     candidate = "opaquevalue123456789"
     artifact = tmp_path / "app.py"
     artifact.write_text(
@@ -147,7 +147,7 @@ def test_redacted_candidate_line_retains_only_allowlisted_features(tmp_path):
     context = guard._redacted_context(artifact, 1)
 
     assert candidate not in context
-    assert "markers=active,credential,runtime,secret" in context
+    assert "markers=none" in context
     assert "structure=assignment" in context
 
 
@@ -173,6 +173,90 @@ def test_contextual_experiment_policy_can_measure_model_allow():
 
     assert verdict == "allow"
     assert reason == "classifier_allow"
+
+
+def test_content_addressed_false_positive_exception_allows_exact_artifact(
+    tmp_path, monkeypatch
+):
+    artifact = tmp_path / "documented-example.txt"
+    artifact.write_text("credential-shaped but reviewed content\n")
+    digest = guard.experiment._sha256_file(artifact)
+    finding = guard._finding("gitleaks", "generic-token", 1, artifact)
+    policy = tmp_path / "exceptions.json"
+    policy.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "entries": [
+                    {
+                        "artifact_sha256": digest,
+                        "finding_keys": ["gitleaks:generic-token"],
+                        "expires_utc": "2099-01-01T00:00:00Z",
+                        "ticket": "SEC-1234",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    policy.chmod(0o600)
+    monkeypatch.setenv("SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST", str(policy))
+    monkeypatch.setattr(
+        guard,
+        "scan_candidates",
+        lambda _path, _scanners: {
+            "artifact_sha256": digest,
+            "findings": [finding],
+            "scanner_errors": [],
+            "scanner_versions": {"gitleaks": "test"},
+        },
+    )
+
+    result = guard.scan_file(artifact, scanners=("gitleaks",))
+
+    assert result["verdict"] == "allow"
+    assert result["reason_code"] == "approved_false_positive_exception"
+
+
+def test_false_positive_exception_cannot_override_private_key(tmp_path, monkeypatch):
+    artifact = tmp_path / "key.txt"
+    artifact.write_text("reviewed private key material\n")
+    digest = guard.experiment._sha256_file(artifact)
+    finding = guard._finding("gitleaks", "shift-private-key", 1, artifact)
+    policy = tmp_path / "exceptions.json"
+    policy.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "entries": [
+                    {
+                        "artifact_sha256": digest,
+                        "finding_keys": ["gitleaks:shift-private-key"],
+                        "expires_utc": "2099-01-01T00:00:00Z",
+                        "ticket": "SEC-1234",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    policy.chmod(0o600)
+    monkeypatch.setenv("SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST", str(policy))
+    monkeypatch.setattr(
+        guard,
+        "scan_candidates",
+        lambda _path, _scanners: {
+            "artifact_sha256": digest,
+            "findings": [finding],
+            "scanner_errors": [],
+            "scanner_versions": {"gitleaks": "test"},
+        },
+    )
+
+    result = guard.scan_file(artifact, scanners=("gitleaks",))
+
+    assert result["verdict"] == "block"
+    assert result["reason_code"] == "non_overridable_hard_block"
 
 
 def test_classifier_rejects_allow_with_credential_reason():
@@ -245,19 +329,14 @@ def test_findings_are_classified_with_redacted_context(tmp_path, monkeypatch):
         ),
     )
 
-    def classify(path, finding):
-        assert candidate not in guard._redacted_context(path, finding["line"])
-        return (
-            {"verdict": "block", "confidence": 0.99, "reason_code": "credential_like"},
-            0.01,
-            "local",
-            "local",
-        )
+    def classify(_path, _finding):
+        raise AssertionError("the enforcement path must not invoke the research model")
 
     monkeypatch.setattr(guard, "classify_redacted", classify)
     result = guard.scan_file(artifact, scanners=("test-scanner",))
 
-    assert result["verdict"] == "block"
+    assert result["verdict"] == "review"
+    assert result["reason_code"] == "strict_scanner_hold"
     assert result["finding_count"] == 1
     assert candidate not in str(result)
 
@@ -284,6 +363,34 @@ def test_clean_filter_blocks_before_emitting_bytes(tmp_path, monkeypatch):
     stdout.flush()
 
     assert status == 2
+    assert stdout_bytes.getvalue() == b""
+
+
+def test_clean_filter_scans_nul_containing_input(tmp_path, monkeypatch):
+    candidate = b"\0api_key = 'live-secret'\n"
+    scanned = []
+    monkeypatch.setenv("SHIFT_LEFTER_ROOT", str(tmp_path / "research"))
+
+    def scan(path):
+        scanned.append(path.read_bytes())
+        return {
+            "verdict": "block",
+            "reason_code": "strict_scanner_hold",
+            "finding_count": 1,
+        }
+
+    monkeypatch.setattr(guard, "scan_file", scan)
+    stdin = io.TextIOWrapper(io.BytesIO(candidate), encoding="utf-8")
+    stdout_bytes = io.BytesIO()
+    stdout = io.TextIOWrapper(stdout_bytes, encoding="utf-8")
+    monkeypatch.setattr(sys, "stdin", stdin)
+    monkeypatch.setattr(sys, "stdout", stdout)
+
+    status = guard.filter_clean("artifact.bin")
+    stdout.flush()
+
+    assert status == 2
+    assert scanned == [candidate]
     assert stdout_bytes.getvalue() == b""
 
 
@@ -321,6 +428,64 @@ def test_install_uses_repo_local_required_filter_and_hooks(tmp_path):
         text=True,
     ).stdout.strip()
     assert required == "true"
+
+
+def test_pre_push_scans_secret_removed_by_later_commit(tmp_path, monkeypatch):
+    repo = tmp_path / "work"
+    subprocess.run(["git", "init", str(repo)], check=True, capture_output=True)
+    for key, value in (
+        ("user.email", "test@example.invalid"),
+        ("user.name", "Test User"),
+    ):
+        subprocess.run(["git", "-C", str(repo), "config", key, value], check=True)
+    artifact = repo / "app.py"
+    artifact.write_text("value = 'safe'\n")
+    subprocess.run(["git", "-C", str(repo), "add", "app.py"], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-m", "base"],
+        check=True,
+        capture_output=True,
+    )
+    old_sha = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    artifact.write_text("api_key = 'secret-in-intermediate-history'\n")
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-am", "add candidate"],
+        check=True,
+        capture_output=True,
+    )
+    artifact.write_text("value = 'safe again'\n")
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-am", "remove candidate"],
+        check=True,
+        capture_output=True,
+    )
+    new_sha = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    monkeypatch.setenv("SHIFT_LEFTER_ROOT", str(tmp_path / "research"))
+
+    def classify(path):
+        blocked = "secret-in-intermediate-history" in path.read_text(errors="ignore")
+        return {
+            "verdict": "block" if blocked else "allow",
+            "reason_code": "strict_scanner_hold" if blocked else "no_scanner_finding",
+            "finding_count": int(blocked),
+        }
+
+    monkeypatch.setattr(guard, "scan_file", classify)
+    results = guard.scan_push(
+        repo, [f"refs/heads/main {new_sha} refs/heads/main {old_sha}\n"]
+    )
+
+    assert any(item["verdict"] == "block" for item in results)
 
 
 def test_pre_receive_scans_proposed_revision_not_worktree(tmp_path, monkeypatch):

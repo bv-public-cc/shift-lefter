@@ -100,7 +100,11 @@ def forward_atomic(
 
 
 def _audit_record(
-    updates: list[RefUpdate], results: list[dict], verdict: str, reason: str
+    updates: list[RefUpdate],
+    results: list[dict],
+    verdict: str,
+    reason: str,
+    pusher_id: str | None,
 ) -> dict:
     transaction = "\n".join(
         f"{item.old_sha} {item.new_sha} {item.ref_name}" for item in updates
@@ -110,6 +114,7 @@ def _audit_record(
         "event_id": hashlib.sha256(transaction.encode()).hexdigest(),
         "verdict": verdict,
         "reason_code": reason,
+        "pusher_id": pusher_id or "unattributed-noncontainer-session",
         "ref_count": len(updates),
         "finding_file_count": len(results),
         "finding_count": sum(int(item.get("finding_count", 0)) for item in results),
@@ -148,6 +153,7 @@ def process_receive(
         [Path, list[RefUpdate], str, Iterable[str]], None
     ] = forward_atomic,
     preflight: Callable[[], dict[str, str]] = guard.preflight_scanners,
+    pusher_id: str | None = None,
 ) -> dict:
     raw_lines = list(lines)
     updates = parse_updates(raw_lines)
@@ -155,7 +161,11 @@ def process_receive(
         preflight()
     except Exception as exc:
         record = _audit_record(
-            updates, [], "review", "scanner_preflight_error_fail_closed"
+            updates,
+            [],
+            "review",
+            "scanner_preflight_error_fail_closed",
+            pusher_id,
         )
         record["scanner_error_count"] = 1
         record["error_type"] = type(exc).__name__
@@ -167,10 +177,14 @@ def process_receive(
         return record
     results = scanner(repo, raw_lines)
     if results:
-        record = _audit_record(updates, results, "block", "secret_policy_rejection")
+        record = _audit_record(
+            updates, results, "block", "secret_policy_rejection", pusher_id
+        )
         _write_audit(record)
         return {**record, "results": results}
-    intent = _audit_record(updates, [], "review", "validated_pending_atomic_forward")
+    intent = _audit_record(
+        updates, [], "review", "validated_pending_atomic_forward", pusher_id
+    )
     try:
         _write_audit(intent)
     except Exception as exc:
@@ -183,12 +197,18 @@ def process_receive(
         forwarder(repo, updates, upstream, allowed_hosts)
     except Exception as exc:
         record = _audit_record(
-            updates, [], "review", "upstream_forward_error_fail_closed"
+            updates,
+            [],
+            "review",
+            "upstream_forward_error_fail_closed",
+            pusher_id,
         )
         record["error_type"] = type(exc).__name__
         _write_audit(record)
         return record
-    record = _audit_record(updates, [], "allow", "validated_and_forwarded_atomically")
+    record = _audit_record(
+        updates, [], "allow", "validated_and_forwarded_atomically", pusher_id
+    )
     try:
         _write_audit(record)
     except Exception as exc:
@@ -211,14 +231,22 @@ def main(argv: list[str] | None = None) -> int:
         default=[],
         help="exact upstream hostname; may be repeated",
     )
+    parser.add_argument(
+        "--require-pusher-identity",
+        action="store_true",
+        help="reject unless the SSH wrapper supplies a hashed public-key identity",
+    )
     args = parser.parse_args(argv)
-    if os.environ.get("SHIFT_LEFTER_STANDALONE") == "1":
-        from shift_lefter import standalone
-
-        guard.classify_redacted = standalone.classify_local
     try:
+        pusher_id = os.environ.get("SHIFT_LEFTER_PUSHER_ID")
+        if args.require_pusher_identity and not pusher_id:
+            raise RuntimeError("authenticated pusher identity is required")
         result = process_receive(
-            args.repo.resolve(), sys.stdin, args.upstream, args.allow_host
+            args.repo.resolve(),
+            sys.stdin,
+            args.upstream,
+            args.allow_host,
+            pusher_id=pusher_id,
         )
     except Exception as exc:
         print(

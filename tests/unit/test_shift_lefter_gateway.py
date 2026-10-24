@@ -50,6 +50,32 @@ def test_blocked_receive_is_never_forwarded(tmp_path, monkeypatch):
     assert "classifier_block" not in audit
 
 
+def test_audit_binds_transaction_to_hashed_pusher_identity(tmp_path, monkeypatch):
+    monkeypatch.setenv("SHIFT_LEFTER_ROOT", str(tmp_path / "evidence"))
+    pusher_id = "sha256:" + "a" * 64
+
+    result = gateway.process_receive(
+        tmp_path,
+        [f"{'1' * 40} {'2' * 40} refs/heads/main\n"],
+        "ssh://git@gitlab.example/repo.git",
+        ["gitlab.example"],
+        lambda _repo, _lines: [
+            {
+                "verdict": "block",
+                "reason_code": "strict_scanner_hold",
+                "finding_count": 1,
+                "scanner_errors": [],
+            }
+        ],
+        lambda *_args: None,
+        lambda: {},
+        pusher_id=pusher_id,
+    )
+
+    assert result["pusher_id"] == pusher_id
+    assert pusher_id in (tmp_path / "evidence/gateway-audit/events.jsonl").read_text()
+
+
 def test_forward_failure_fails_closed(tmp_path, monkeypatch):
     monkeypatch.setenv("SHIFT_LEFTER_ROOT", str(tmp_path / "evidence"))
     old_sha = "1" * 40

@@ -33,6 +33,8 @@ starting a gateway:
 ```
 
 The full 3,000-item protocol is documented in [STANDALONE-REPRODUCTION.md](shift_lefter/STANDALONE-REPRODUCTION.md).
+The review findings, implemented controls, and corrected rerun namespace are
+recorded in [REVIEW-REMEDIATIONS.md](REVIEW-REMEDIATIONS.md).
 
 The publishable labeled test-data manifest is in
 [`results/test-data/ground_truth.json`](results/test-data/ground_truth.json),
@@ -132,27 +134,32 @@ export SHIFT_LEFTER_DETECT_SECRETS="$(pwd)/.venv/bin/detect-secrets"
 After installation, developers continue to use ordinary `git add`, `git commit`,
 and `git push` commands:
 
-1. A required clean filter checks text before Git accepts a blob during
+1. A required clean filter checks every blob, including NUL-containing input,
+   before Git accepts it during
    `git add`. An `allow` result streams the original bytes unchanged. A
    `review` or `block` result emits no bytes and makes `git add` fail.
 2. A pre-commit hook scans the exact staged blobs, not potentially different
    working-tree files.
-3. A pre-push hook scans the changed blobs in the outgoing commit range.
+3. A pre-push hook scans all new objects in the outgoing commit range,
+   including intermediate blobs and commit/tag messages.
 
-The same scanner/policy engine is used in both modes. The deterministic scanners
-discover candidates. Candidate values are replaced with hash-tagged redactions;
-the candidate line and nearby source are projected into allowlisted semantic
-markers and structural features before reaching the allowlisted local model. Scanner
-reports are parsed in memory and raw-object copies use ephemeral storage. Raw
-source, raw values, prompts, and scanner reports are never durably logged. Missing
-scanners, local-model errors, and unknown outcomes fail closed as `review`.
+The enforcement path is deliberately scanner-only and strict. Scanner reports
+are parsed in memory and raw-object copies use ephemeral storage. Raw source,
+raw values, and scanner reports are never durably logged. Missing scanners and
+unknown outcomes fail closed as `review`. The contextual model is isolated in
+the experiment runner and is not consulted by `git add`, hooks, or the gateway.
 
-The gateway and workstation controls default to `SHIFT_LEFTER_POLICY_MODE=strict`.
-In that mode, any scanner finding is held even when the model recommends
-`allow`; the model still classifies and explains the candidate for review.
-`contextual` mode permits a high-confidence model allow and exists for controlled
-evaluation. Promote it to enforcement only after representative testing shows
-that its recall and false-negative thresholds are acceptable.
+The gateway and workstation controls require
+`SHIFT_LEFTER_POLICY_MODE=strict`. Any other value fails closed. Contextual
+model decisions exist only as measured research conditions and cannot clear an
+enforcement finding.
+
+A confirmed false positive can be approved without weakening the scanner policy
+by setting `SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST` to an administrator-managed
+JSON file outside every Git worktree. Each entry contains the exact artifact
+SHA-256, exact sorted `scanner:rule` keys, an expiry with timezone, and a review
+ticket. Invalid, stale, or changed entries fail closed, and private-key findings
+cannot be excepted. See [REVIEW-REMEDIATIONS.md](REVIEW-REMEDIATIONS.md).
 
 The gate deliberately does not rewrite a credential into a guessed placeholder.
 Silent source rewriting can corrupt code or hide a credential that must be
@@ -174,6 +181,11 @@ conditions. Each run records the selected scanner in every result row and the
 run manifest. The reproduction guide shows how to compare models within one
 scanner and how to summarize different scanners without pretending that they
 produced identical candidates.
+
+The archived v4/v5 corpus contains class-correlated context vocabulary and is
+retained only as historical defect-discovery evidence. New runs must use
+`independent-context-evaluation`; its neutral context templates are distributed
+across both labels, and candidate-line words are not projected into prompts.
 
 ## Third-party scanners
 

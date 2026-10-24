@@ -22,3 +22,12 @@ The instantiated positive files are deliberately absent from Git because even no
 The committed generator, fixed seed, ground-truth manifest, and test-data lock let a reviewer regenerate and verify the test dataset without storing the instantiated candidates in source control. Internal endpoint addresses are replaced by stable labels in the public copy. The research archive retains the original content-free records and hashes.
 
 The 300-item v2 experiment is a pilot. The 3,000-item v3 execution is retained as defect-discovery evidence, and the v4 experiment evaluates the corrections against the same locked test data. Both are part of the research. The chronology and reuse of inspected data are stated so readers do not mistake v4 for a new independent holdout test. The v5 single-scanner experiment isolates the contribution of Gitleaks, TruffleHog, and detect-secrets across the same three model conditions.
+
+## Post-review status
+
+The committed v4/v5 bundles also use context vocabulary correlated with the
+ground-truth class. They demonstrate behavior on that synthetic generator but
+must not be cited as evidence of model generalization. The corrected rerun uses
+the separately named `independent-context-evaluation` protocol and v6 result
+names. See `REVIEW-REMEDIATIONS.md`. Existing result files are intentionally
+unchanged so the historical record and its hashes remain intact.

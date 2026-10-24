@@ -4,10 +4,6 @@ set -eu
 : "${SHIFT_LEFTER_PROJECT_NAME:?set SHIFT_LEFTER_PROJECT_NAME}"
 : "${SHIFT_LEFTER_UPSTREAM_URL:?set SHIFT_LEFTER_UPSTREAM_URL}"
 : "${SHIFT_LEFTER_UPSTREAM_HOST:?set SHIFT_LEFTER_UPSTREAM_HOST}"
-: "${SHIFT_LEFTER_MODEL_ENDPOINT:?set SHIFT_LEFTER_MODEL_ENDPOINT}"
-: "${SHIFT_LEFTER_MODEL_NAME:?set SHIFT_LEFTER_MODEL_NAME}"
-: "${SHIFT_LEFTER_ALLOWED_MODEL_HOSTS:?set SHIFT_LEFTER_ALLOWED_MODEL_HOSTS}"
-
 case "$SHIFT_LEFTER_PROJECT_NAME" in
   *[!A-Za-z0-9._-]*|""|.*|*..*) echo "invalid project name" >&2; exit 2 ;;
 esac
@@ -30,13 +26,7 @@ keys = (
     "SHIFT_LEFTER_GITLEAKS",
     "SHIFT_LEFTER_TRUFFLEHOG",
     "SHIFT_LEFTER_DETECT_SECRETS",
-    "SHIFT_LEFTER_STANDALONE",
-    "SHIFT_LEFTER_MODEL_ENDPOINT",
-    "SHIFT_LEFTER_MODEL_NAME",
-    "SHIFT_LEFTER_ALLOWED_MODEL_HOSTS",
-    "SHIFT_LEFTER_ALLOW_PLAINTEXT_MODEL_HOSTS",
-    "SHIFT_LEFTER_CA_BUNDLE",
-    "SHIFT_LEFTER_LOCAL_API_KEY_FILE",
+    "SHIFT_LEFTER_FALSE_POSITIVE_ALLOWLIST",
     "GIT_SSH_COMMAND",
 )
 config = {key: os.environ[key] for key in keys if os.environ.get(key)}
@@ -62,7 +52,8 @@ cat >"$hook" <<'EOF'
 exec python -m shift_lefter.gateway \
   --repo "$PWD" \
   --upstream "$SHIFT_LEFTER_UPSTREAM_URL" \
-  --allow-host "$SHIFT_LEFTER_UPSTREAM_HOST"
+  --allow-host "$SHIFT_LEFTER_UPSTREAM_HOST" \
+  --require-pusher-identity
 EOF
 chmod 0700 "$hook"
 chown -R git:git "$repo" /srv/evidence

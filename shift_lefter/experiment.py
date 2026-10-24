@@ -28,6 +28,7 @@ CONFIG = Path(__file__).with_name("gitleaks.toml")
 CHANNELS = ("source", "config", "iac", "docs", "agent_prompt")
 CATEGORIES = ("api_token", "generic_token", "password", "basic_auth", "private_key")
 EXPANDED_SET = "expanded-evaluation"
+INDEPENDENT_CONTEXT_SET = "independent-context-evaluation"
 EXPANDED_CATEGORIES = CATEGORIES + (
     "aws_access_key",
     "github_pat",
@@ -330,6 +331,73 @@ def _expanded_render(
     raise ValueError(channel)
 
 
+def _independent_context_render(
+    channel: str,
+    category: str,
+    candidate: str,
+    artifact_id: str,
+    variant: int,
+) -> tuple[str, str, int]:
+    """Render label-independent context for protocol v2.
+
+    The same four neutral contexts are distributed across both classes. Ground
+    truth remains external to the artifact; no safe/live label synonym is
+    selected from the class label.
+    """
+    notes = (
+        "credential-shaped value associated with a service integration",
+        "configuration value retained for compatibility review",
+        "token-shaped material included in an application artifact",
+        "authentication field awaiting an operator decision",
+    )
+    context_variant = variant % len(notes)
+    note = notes[context_variant]
+    if category == "password":
+        expression = f'password = "{candidate}"'
+    elif category == "basic_auth":
+        expression = f"Authorization: Basic {candidate}"
+    elif category == "private_key":
+        expression = candidate + "\n-----END PRIVATE KEY-----"
+    elif category == "database_url":
+        expression = f'database_url = "{candidate}"'
+    elif category == "slack_webhook":
+        expression = f'webhook_url = "{candidate}"'
+    elif category == "aws_access_key":
+        expression = f'aws_access_key_id = "{candidate}"'
+    elif category == "github_pat":
+        expression = f'github_token = "{candidate}"'
+    elif category == "jwt":
+        expression = f'bearer_token = "{candidate}"'
+    else:
+        expression = f'api_token = "{candidate}"'
+
+    if channel == "source":
+        name, content = f"{artifact_id}.py", f"# {note}\n{expression}\n"
+    elif channel == "config":
+        name, content = (
+            f"{artifact_id}.yaml",
+            f"# {note}\nmode: candidate\nvalue: {json.dumps(expression)}\n",
+        )
+    elif channel == "iac":
+        name, content = (
+            f"{artifact_id}.tf",
+            f"# {note}\nlocals {{\n  credential_candidate = {json.dumps(expression)}\n}}\n",
+        )
+    elif channel == "docs":
+        name, content = (
+            f"{artifact_id}.md",
+            f"# Credential review\n\n{note.capitalize()}.\n\n```text\n{expression}\n```\n",
+        )
+    elif channel == "agent_prompt":
+        name, content = (
+            f"{artifact_id}.txt",
+            f"Review this candidate. Context: {note}.\nDATA_START\n{expression}\nDATA_END\n",
+        )
+    else:
+        raise ValueError(channel)
+    return name, content, context_variant
+
+
 def _expanded_clean_control(artifact_id: str, variant: int) -> tuple[str, str, str]:
     controls = (
         ("checksum", f"sha256:{hashlib.sha256(artifact_id.encode()).hexdigest()}"),
@@ -415,6 +483,10 @@ def generate(set_name: str, count: int, seed: int) -> dict:
         raise ValueError(
             "the expanded evaluation set must contain exactly 3000 artifacts"
         )
+    if set_name == INDEPENDENT_CONTEXT_SET and count != 3000:
+        raise ValueError(
+            "the independent-context evaluation set must contain exactly 3000 artifacts"
+        )
     if count % len(CHANNELS):
         raise ValueError("count must be divisible by five channels")
     root = _research_root()
@@ -437,13 +509,15 @@ def generate(set_name: str, count: int, seed: int) -> dict:
             flagged_negative = (not positive) and local_index < positive_per_channel + (
                 per_channel - positive_per_channel
             ) * 3 // 4
-            categories = EXPANDED_CATEGORIES if set_name == EXPANDED_SET else CATEGORIES
+            expanded_protocol = set_name in {EXPANDED_SET, INDEPENDENT_CONTEXT_SET}
+            categories = EXPANDED_CATEGORIES if expanded_protocol else CATEGORIES
             category = categories[(local_index + channel_index) % len(categories)]
             prefix = "X" if set_name == EXPANDED_SET else set_name[:1].upper()
             artifact_id = f"SL-{prefix}-{serial:04d}"
             serial += 1
+            context_variant = None
             if not positive and not flagged_negative:
-                if set_name == EXPANDED_SET:
+                if expanded_protocol:
                     filename, content, category_value = _expanded_clean_control(
                         artifact_id, local_index
                     )
@@ -452,18 +526,23 @@ def generate(set_name: str, count: int, seed: int) -> dict:
                     content = f"Artifact {artifact_id}: ordinary configuration with no credential candidate.\n"
                     category_value = "clean_control"
             else:
-                if set_name == EXPANDED_SET:
+                if expanded_protocol:
                     candidate = _expanded_candidate(
                         rng, category, positive, local_index
                     )
-                    filename, content = _expanded_render(
-                        channel,
-                        category,
-                        candidate,
-                        positive,
-                        artifact_id,
-                        local_index,
-                    )
+                    if set_name == INDEPENDENT_CONTEXT_SET:
+                        filename, content, context_variant = _independent_context_render(
+                            channel, category, candidate, artifact_id, local_index
+                        )
+                    else:
+                        filename, content = _expanded_render(
+                            channel,
+                            category,
+                            candidate,
+                            positive,
+                            artifact_id,
+                            local_index,
+                        )
                 else:
                     candidate = _candidate(rng, category, positive)
                     filename, content = _render(
@@ -474,20 +553,27 @@ def generate(set_name: str, count: int, seed: int) -> dict:
                     canaries.append(candidate)
             path = artifacts / filename
             path.write_text(content, encoding="utf-8")
-            records.append(
-                {
-                    "artifact_id": artifact_id,
-                    "filename": filename,
-                    "label": 1 if positive else 0,
-                    "channel": channel,
-                    "category": category_value,
-                    "sha256": _sha256_file(path),
-                }
-            )
+            record = {
+                "artifact_id": artifact_id,
+                "filename": filename,
+                "label": 1 if positive else 0,
+                "channel": channel,
+                "category": category_value,
+                "sha256": _sha256_file(path),
+            }
+            if set_name == INDEPENDENT_CONTEXT_SET and context_variant is not None:
+                record["context_variant"] = context_variant
+            records.append(record)
 
     rng.shuffle(records)
     manifest = {
         "schema_version": 1,
+        "protocol_version": (
+            "independent-context-v1"
+            if set_name == INDEPENDENT_CONTEXT_SET
+            else "legacy-label-correlated-context"
+        ),
+        "context_label_independent": set_name == INDEPENDENT_CONTEXT_SET,
         "set_name": set_name,
         "seed": seed,
         "count": count,
