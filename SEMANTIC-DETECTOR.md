@@ -26,11 +26,12 @@ schema and allowlisted evidence codes.
 ## Asymmetric decisions
 
 A scanner miss becomes a semantic detection only when the model returns
-`secret` with confidence at least `0.95` and risk evidence. A scanner finding
+`secret` with confidence at least `0.90` and risk evidence. A scanner finding
 is suppressed only when all findings map to candidates, each candidate is
-classified `false_positive` with confidence at least `0.99`, and local
+classified `false_positive` with confidence at least `0.90`, and local
 deterministic extraction independently finds a placeholder or recognized
 non-secret identifier. Private-key findings are never suppressible.
+Both thresholds are explicit CLI options and are recorded in the run summary.
 
 An invalid or unavailable model response falls back to the original scanner
 decision. Thus the experimental classifier cannot turn a scanner block into an

@@ -132,11 +132,17 @@ def run(
     workers: int = 1,
     scanners: Iterable[str] | None = None,
     semantic_batch: bool = False,
+    semantic_detection_threshold: float = 0.90,
+    semantic_suppression_threshold: float = 0.90,
 ) -> dict:
     result_name = _result_name(result_name)
     selected_scanners = _scanners(scanners)
     if workers < 1 or workers > 16:
         raise ValueError("workers must be between 1 and 16")
+    if not 0.0 <= semantic_detection_threshold <= 1.0:
+        raise ValueError("semantic detection threshold must be between zero and one")
+    if not 0.0 <= semantic_suppression_threshold <= 1.0:
+        raise ValueError("semantic suppression threshold must be between zero and one")
     manifest, _truth_by_id = _truth(source_set)
     raw = experiment._research_root() / "raw" / source_set
     output_dir = _output_dir(result_name)
@@ -251,7 +257,12 @@ def run(
                     )
                 else:
                     verdict, reason = semantic.decide(
-                        findings, candidates, classifications, errors
+                        findings,
+                        candidates,
+                        classifications,
+                        errors,
+                        detection_threshold=semantic_detection_threshold,
+                        suppression_threshold=semantic_suppression_threshold,
                     )
             else:
                 verdict, reason = guard.decide_findings(
@@ -310,6 +321,12 @@ def run(
         "selected_scanners": list(selected_scanners),
         "classifier_strategy": (
             "batched_semantic_detector" if semantic_batch else "per_finding_context"
+        ),
+        "semantic_detection_threshold": (
+            semantic_detection_threshold if semantic_batch else None
+        ),
+        "semantic_suppression_threshold": (
+            semantic_suppression_threshold if semantic_batch else None
         ),
         "duration_seconds": round(time.perf_counter() - started, 3),
         "model_endpoints": sorted(endpoints),
@@ -668,6 +685,10 @@ def main(argv: list[str] | None = None) -> int:
     run_parser.add_argument("--repeats", type=int, default=3)
     run_parser.add_argument("--workers", type=int, default=1)
     run_parser.add_argument("--semantic-batch", action="store_true")
+    run_parser.add_argument("--semantic-detection-threshold", type=float, default=0.90)
+    run_parser.add_argument(
+        "--semantic-suppression-threshold", type=float, default=0.90
+    )
     run_parser.add_argument(
         "--scanner", action="append", choices=guard.DEFAULT_SCANNERS
     )
@@ -693,6 +714,8 @@ def main(argv: list[str] | None = None) -> int:
             args.workers,
             args.scanner,
             args.semantic_batch,
+            args.semantic_detection_threshold,
+            args.semantic_suppression_threshold,
         )
         if args.command == "run"
         else (

@@ -154,6 +154,12 @@ def main(argv: list[str] | None = None) -> int:
     scanner_test_run.add_argument("--workers", type=int, default=1)
     scanner_test_run.add_argument("--semantic-batch", action="store_true")
     scanner_test_run.add_argument(
+        "--semantic-detection-threshold", type=float, default=0.90
+    )
+    scanner_test_run.add_argument(
+        "--semantic-suppression-threshold", type=float, default=0.90
+    )
+    scanner_test_run.add_argument(
         "--scanner", action="append", choices=guard.DEFAULT_SCANNERS
     )
     for command in (
@@ -183,6 +189,8 @@ def main(argv: list[str] | None = None) -> int:
             args.workers,
             args.scanner,
             args.semantic_batch,
+            args.semantic_detection_threshold,
+            args.semantic_suppression_threshold,
         )
     elif args.command == "scanner-test-analyze":
         result = scanner_test.analyze(args.result_name, args.source_set)

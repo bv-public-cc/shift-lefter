@@ -384,8 +384,14 @@ def decide(
     scanner_errors: list[dict],
     *,
     allow_suppression: bool = True,
+    detection_threshold: float = 0.90,
+    suppression_threshold: float = 0.90,
 ) -> tuple[str, str]:
     """Apply asymmetric union detection and corroborated suppression."""
+    if not 0.0 <= detection_threshold <= 1.0:
+        raise ValueError("semantic detection threshold must be between zero and one")
+    if not 0.0 <= suppression_threshold <= 1.0:
+        raise ValueError("semantic suppression threshold must be between zero and one")
     if scanner_errors:
         return "review", "scanner_error_fail_closed"
     by_id = {item["candidate_id"]: item for item in assessments}
@@ -395,7 +401,7 @@ def decide(
             not candidate["scanner_hit"]
             and assessment
             and assessment["classification"] == "secret"
-            and assessment["confidence"] >= 0.95
+            and assessment["confidence"] >= detection_threshold
             and RISK_EVIDENCE.intersection(assessment["evidence_codes"])
         ):
             return "block", "semantic_secret_detected"
@@ -417,7 +423,7 @@ def decide(
         if (
             not assessment
             or assessment["classification"] != "false_positive"
-            or assessment["confidence"] < 0.99
+            or assessment["confidence"] < suppression_threshold
             or not _corroborated_safe(candidate, assessment)
         ):
             return "block", "semantic_scanner_hold"

@@ -102,7 +102,7 @@ def test_semantic_suppression_requires_model_and_deterministic_agreement(tmp_pat
         "allow",
         "corroborated_false_positive",
     )
-    assessment["confidence"] = 0.98
+    assessment["confidence"] = 0.89
     assert semantic.decide(findings, candidates, [assessment], [])[0] == "block"
 
 
