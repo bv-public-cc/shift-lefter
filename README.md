@@ -38,6 +38,9 @@ recorded in [REVIEW-REMEDIATIONS.md](REVIEW-REMEDIATIONS.md). The experimental
 batched detector for measuring scanner-miss recovery and corroborated
 false-positive suppression is documented in
 [SEMANTIC-DETECTOR.md](SEMANTIC-DETECTOR.md).
+The follow-up trained review experiment, including its privacy boundary,
+repository-separated data, safety behavior, and reproduction commands, is in
+[TRAINED-MODEL-EXPERIMENT.md](TRAINED-MODEL-EXPERIMENT.md).
 
 The publishable labeled test-data manifest is in
 [`results/test-data/ground_truth.json`](results/test-data/ground_truth.json),

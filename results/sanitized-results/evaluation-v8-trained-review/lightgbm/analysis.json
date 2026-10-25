@@ -1,0 +1,126 @@
+{
+  "detection_threshold": 0.99,
+  "final_data": "trained-review-fresh-test-v1",
+  "final_predictions_sha256": "dfef7883dcc3661e5056514aa94a21d1f8ec15c4dd99e8f66e4f84357d15a037",
+  "final_repository_count": 240,
+  "final_sample_count": 4800,
+  "incremental_outcomes": {
+    "introduced_false_alarms": 0,
+    "introduced_misses": 0,
+    "recovered_misses": 99,
+    "removed_false_alarms": 1429
+  },
+  "input_version": "safe-features-v1",
+  "latency": {
+    "batched_final_test": {
+      "mean_seconds_per_file": 1.0641e-05,
+      "total_inference_seconds": 0.051079
+    },
+    "developer_scale_batch_one": {
+      "batch_size": 1,
+      "mean_warm_seconds_per_file": 0.000718249,
+      "measurement": "model load is reported separately; inference uses a warm model and one file per call",
+      "model": "lightgbm",
+      "model_load_seconds": 1.02262,
+      "sample_count": 256,
+      "sample_selection": "evenly spaced across the untouched final test",
+      "total_warm_inference_seconds": 0.183872
+    }
+  },
+  "model": "lightgbm",
+  "model_artifact": {
+    "artifact_sha256": "dad2cecd384a1b26e1da885147aecbecd23e3de12fa70ef96603f73a6168fb70",
+    "feature_code_sha256": "812adb8c9d014d5c873511171791a88a09a0644bca8c54ea730eb1718a76d66a",
+    "implementation": "lightgbm.LGBMClassifier",
+    "input_version": "safe-features-v1",
+    "model": "lightgbm",
+    "seed": 410041,
+    "software_versions": {
+      "accelerate": "1.13.0",
+      "lightgbm": "4.7.0",
+      "peft": "0.18.1",
+      "scikit-learn": "1.8.0",
+      "torch": "2.10.0",
+      "transformers": "4.57.6"
+    },
+    "training_code_sha256": "b2c743461daf5b7e1bf95e46cae3d8cee21e3930c89c936cd129a13865ce87c2",
+    "training_features_sha256": "fe90766627b239f251f89df037c765b33dc9e2b4979c0a21d71b18f3a2720c35",
+    "training_sample_count": 30000,
+    "training_seconds": 0.659783
+  },
+  "private_key_file_count": 90,
+  "private_key_files_blocked": 90,
+  "reason_counts": {
+    "fixed_rule_confirmed_false_positive": 1429,
+    "non_overridable_hard_block": 90,
+    "scanner_decision_retained": 3182,
+    "trained_model_secret_detected": 99
+  },
+  "records_sha256": "feb9f5917aad18c503bdace65f06f7f85f6ebad327dcdda51719b7da729cbc89",
+  "scanner_baseline": {
+    "f1": 0.590882178804026,
+    "fn": 103,
+    "fp": 1970,
+    "precision": 0.4317854052494952,
+    "recall": 0.935625,
+    "tn": 1230,
+    "tp": 1497
+  },
+  "scanner_plus_fixed_rules": {
+    "f1": 0.8229796591533811,
+    "fn": 103,
+    "fp": 541,
+    "precision": 0.7345436702649657,
+    "recall": 0.935625,
+    "tn": 2659,
+    "tp": 1497
+  },
+  "scanner_plus_trained_model": {
+    "f1": 0.8541610917848542,
+    "fn": 4,
+    "fp": 541,
+    "precision": 0.7468413664014975,
+    "recall": 0.9975,
+    "tn": 2659,
+    "tp": 1596
+  },
+  "study": "evaluation-v8-trained-review",
+  "suppression_threshold": 0.99,
+  "threshold_source": "setup repositories only",
+  "trained_model_only": {
+    "f1": 0.958139534883721,
+    "fn": 55,
+    "fp": 80,
+    "precision": 0.9507692307692308,
+    "recall": 0.965625,
+    "tn": 3120,
+    "tp": 1545
+  },
+  "trained_model_value_beyond_fixed_rules": {
+    "additional_false_negatives": -99,
+    "additional_false_positives": 0,
+    "additional_true_negatives": 0,
+    "additional_true_positives": 99
+  },
+  "v7_reference": {
+    "baseline": {
+      "f1": 0.5896067970756768,
+      "fn": 111,
+      "fp": 1966,
+      "precision": 0.43146327356853675,
+      "recall": 0.9307548346849657,
+      "tn": 1231,
+      "tp": 1492
+    },
+    "hybrid": {
+      "f1": 0.6253918495297806,
+      "fn": 7,
+      "fp": 1905,
+      "precision": 0.45586975149957154,
+      "recall": 0.9956331877729258,
+      "tn": 1292,
+      "tp": 1596
+    },
+    "sample_count": 4800
+  }
+}

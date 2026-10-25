@@ -1,0 +1,16 @@
+{
+  "build_seconds": 1.537,
+  "distinct_family_count": 32,
+  "distinct_layout_count": 10,
+  "feature_code_sha256": "812adb8c9d014d5c873511171791a88a09a0644bca8c54ea730eb1718a76d66a",
+  "features_sha256": "c5be22b12479674068f08f38d7ead4369f670834ced30e9d47a79e2e78a02866",
+  "generator_sha256": "e538f4981fea937d0656de450e65b5424d63984cf324334965fe757e674c4b07",
+  "manifest_sha256": "55c0f2124be81bc05ee91b26801d2fc39c46a8f72504de50e07cbcfec15719df",
+  "negative_count": 3200,
+  "positive_count": 1600,
+  "repository_count": 240,
+  "sample_count": 4800,
+  "seed": 910041,
+  "smallest_family_count": 80,
+  "test_name": "trained-review-fresh-test-v1"
+}

@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "f1": 0.590882178804026,
+    "fn": 103,
+    "fp": 1970,
+    "precision": 0.4317854052494952,
+    "recall": 0.935625,
+    "tn": 1230,
+    "tp": 1497
+  },
+  "records_sha256": "3fb5ccfcdba433b1b5322825208924496bf74932a3b093fbe908e91c084babc6",
+  "repository_count": 240,
+  "sample_count": 4800,
+  "saved_v7_features_sha256": "35cc0d7a6e6b4b1cd824b00a065bacf8bc21551523e9c469525f4bd28237c30c",
+  "selection_status": "activated only after training design was fixed",
+  "source": "trained-review-fresh-test-v1",
+  "v7_comparison_source": "evaluation-v7-operational-spark-qwen-calibrated"
+}

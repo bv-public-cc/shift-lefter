@@ -85,3 +85,27 @@ hashes, and limitations. The v7 evidence gives a clear result for this fixed
 test set. It provides a credible simulation of everyday development work, but
 it does not prove that the system will perform the same way in every real
 repository.
+
+## Trained review v8
+
+The v8 experiment compares LightGBM, IBM Granite 4.1 3B Base, and Qwen3 4B
+Base using the same non-revealing facts. Training, setup, and final-test
+repositories are separate. The two decision thresholds are selected with setup
+data only. A new 4,800-file final test uses a different seed and independently
+randomized family, layout, note, and value choices. The saved v7 result remains
+a historical comparison.
+
+The published v8 files include data counts and hashes, privacy checks, training
+coverage, per-model decisions, threshold choices, final-test measurements,
+latency, and a side-by-side comparison. Raw generated values and model weights
+remain outside Git. See `TRAINED-MODEL-EXPERIMENT.md` for the method and
+reproduction commands.
+
+On the new 4,800-file final test, the scanner alone missed 103 secrets and
+raised 1,970 false alarms. The LightGBM and Qwen hybrids each reduced that to
+4 misses and 541 false alarms, with no newly introduced mistake. Granite
+reduced misses to 12 but left 788 false alarms. LightGBM is the setup-selected
+default because it matched Qwen's final decisions with much lower cost and
+latency. These results apply to new files, values, and repositories drawn from
+the experiment's defined families; they do not prove performance on unknown
+secret formats.

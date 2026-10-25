@@ -1,0 +1,9 @@
+{
+  "dataset_name": "trained-review-v1",
+  "feature_code_sha256": "812adb8c9d014d5c873511171791a88a09a0644bca8c54ea730eb1718a76d66a",
+  "generator_sha256": "61daa7de34bfc4eaeba1c12903b25135616f4642cbf2d7af34475073ddc95601",
+  "manifest_sha256": "207ef22152ebdac8da86806444989d59d0d5bafccc07d63e902035695f4759cd",
+  "seed": 410041,
+  "setup_features_sha256": "b4e6a4c4a28d52801854274c9f35b1f0f46c72e94cde893395853689cb5b2c87",
+  "train_features_sha256": "fe90766627b239f251f89df037c765b33dc9e2b4979c0a21d71b18f3a2720c35"
+}

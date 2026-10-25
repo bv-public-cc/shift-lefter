@@ -1,0 +1,6 @@
+{
+  "forbidden_model_input_field_count": 0,
+  "passed": true,
+  "raw_canary_hit_count_outside_raw_data": 0,
+  "test_name": "trained-review-fresh-test-v1"
+}

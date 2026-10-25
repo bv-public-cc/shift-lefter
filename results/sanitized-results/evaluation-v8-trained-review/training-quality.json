@@ -1,0 +1,1372 @@
+{
+  "dataset_name": "trained-review-v1",
+  "descriptive_final_ranking": [
+    "lightgbm",
+    "qwen",
+    "granite"
+  ],
+  "interpretation": "The recommended default is selected from setup data, not final-test labels. The final ranking describes the independent result and is not used to tune thresholds or choose a different winner after seeing the answers. A larger model adds practical value only if its setup result supports selecting it and its final safety and accuracy justify the extra latency and operating cost.",
+  "models": {
+    "granite": {
+      "file_channel_metrics": {
+        "configuration": {
+          "f1": 0.7903091060985797,
+          "fn": 8,
+          "fp": 243,
+          "precision": 0.6606145251396648,
+          "recall": 0.9833679833679834,
+          "sample_count": 1414,
+          "tn": 690,
+          "tp": 473
+        },
+        "documentation": {
+          "f1": 0.898876404494382,
+          "fn": 3,
+          "fp": 33,
+          "precision": 0.8290155440414507,
+          "recall": 0.9815950920245399,
+          "sample_count": 474,
+          "tn": 278,
+          "tp": 160
+        },
+        "infrastructure": {
+          "f1": 0.786683107274969,
+          "fn": 0,
+          "fp": 173,
+          "precision": 0.6483739837398373,
+          "recall": 1.0,
+          "sample_count": 941,
+          "tn": 449,
+          "tp": 319
+        },
+        "source": {
+          "f1": 0.7771010962241168,
+          "fn": 1,
+          "fp": 182,
+          "precision": 0.6367265469061876,
+          "recall": 0.996875,
+          "sample_count": 999,
+          "tn": 497,
+          "tp": 319
+        },
+        "test": {
+          "f1": 0.8015170670037927,
+          "fn": 0,
+          "fp": 157,
+          "precision": 0.6687763713080169,
+          "recall": 1.0,
+          "sample_count": 972,
+          "tn": 498,
+          "tp": 317
+        }
+      },
+      "final_metrics": {
+        "f1": 0.7987927565392354,
+        "fn": 12,
+        "fp": 788,
+        "precision": 0.6683501683501684,
+        "recall": 0.9925,
+        "tn": 2412,
+        "tp": 1588
+      },
+      "fixed_rules_without_model": {
+        "f1": 0.8229796591533811,
+        "fn": 103,
+        "fp": 541,
+        "precision": 0.7345436702649657,
+        "recall": 0.935625,
+        "tn": 2659,
+        "tp": 1497
+      },
+      "incremental_outcomes": {
+        "introduced_false_alarms": 0,
+        "introduced_misses": 0,
+        "recovered_misses": 91,
+        "removed_false_alarms": 1182
+      },
+      "latency": {
+        "batched_final_test": {
+          "mean_seconds_per_file": 0.014077912,
+          "total_inference_seconds": 67.573975
+        },
+        "developer_scale_batch_one": {
+          "batch_size": 1,
+          "mean_warm_seconds_per_file": 0.084255444,
+          "measurement": "model load is reported separately; inference uses a warm model and one file per call",
+          "model": "granite",
+          "model_load_seconds": 13.070794,
+          "sample_count": 256,
+          "sample_selection": "evenly spaced across the untouched final test",
+          "total_warm_inference_seconds": 21.569394
+        }
+      },
+      "model_only_final_metrics": {
+        "f1": 0.8959571938168847,
+        "fn": 93,
+        "fp": 257,
+        "precision": 0.8543083900226758,
+        "recall": 0.941875,
+        "tn": 2943,
+        "tp": 1507
+      },
+      "secret_family_metrics": {
+        "aws_access_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 83,
+          "tn": 0,
+          "tp": 83
+        },
+        "azure_storage": {
+          "f1": 0.9789473684210526,
+          "fn": 4,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 0.9587628865979382,
+          "sample_count": 97,
+          "tn": 0,
+          "tp": 93
+        },
+        "basic_auth": {
+          "f1": 0.9578947368421054,
+          "fn": 8,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 0.9191919191919192,
+          "sample_count": 99,
+          "tn": 0,
+          "tp": 91
+        },
+        "container_digest": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 203,
+          "tn": 203,
+          "tp": 0
+        },
+        "database_url": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "documented_aws_example": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 199,
+          "tn": 199,
+          "tp": 0
+        },
+        "encoded_nonsecret_blob": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 198,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 220,
+          "tn": 22,
+          "tp": 0
+        },
+        "generic_runtime_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 109,
+          "tn": 0,
+          "tp": 109
+        },
+        "git_object_id": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 198,
+          "tn": 198,
+          "tp": 0
+        },
+        "github_pat": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 93,
+          "tn": 0,
+          "tp": 93
+        },
+        "gitlab_pat": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "google_api_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 95,
+          "tn": 0,
+          "tp": 95
+        },
+        "jwt_hs256": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 109,
+          "tn": 0,
+          "tp": 109
+        },
+        "npm_token": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 80,
+          "tn": 0,
+          "tp": 80
+        },
+        "package_integrity": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 193,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 211,
+          "tn": 18,
+          "tp": 0
+        },
+        "placeholder_basic_auth": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 189,
+          "tn": 189,
+          "tp": 0
+        },
+        "placeholder_database_url": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 77,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 177,
+          "tn": 100,
+          "tp": 0
+        },
+        "placeholder_github_pat": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 205,
+          "tn": 205,
+          "tp": 0
+        },
+        "placeholder_gitlab_pat": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 89,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 208,
+          "tn": 119,
+          "tp": 0
+        },
+        "placeholder_slack_token": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 223,
+          "tn": 223,
+          "tp": 0
+        },
+        "private_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 90,
+          "tn": 0,
+          "tp": 90
+        },
+        "public_key": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 180,
+          "tn": 180,
+          "tp": 0
+        },
+        "resource_identifier": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 202,
+          "tn": 202,
+          "tp": 0
+        },
+        "sendgrid_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "sha256_checksum": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 197,
+          "tn": 197,
+          "tp": 0
+        },
+        "slack_bot_token": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 103,
+          "tn": 0,
+          "tp": 103
+        },
+        "slack_webhook": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 108,
+          "tn": 0,
+          "tp": 108
+        },
+        "split_runtime_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 100,
+          "tn": 0,
+          "tp": 100
+        },
+        "stripe_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 101,
+          "tn": 0,
+          "tp": 101
+        },
+        "template_reference": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 150,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 207,
+          "tn": 57,
+          "tp": 0
+        },
+        "unsigned_example_jwt": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 81,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 189,
+          "tn": 108,
+          "tp": 0
+        },
+        "uuid": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 192,
+          "tn": 192,
+          "tp": 0
+        }
+      },
+      "setup_metrics_used_for_selection": {
+        "f1": 0.808259587020649,
+        "fn": 1,
+        "fp": 194,
+        "precision": 0.6793388429752066,
+        "recall": 0.9975728155339806,
+        "tn": 594,
+        "tp": 411
+      },
+      "trained_model_value_beyond_fixed_rules": {
+        "additional_false_negatives": -91,
+        "additional_false_positives": 247,
+        "additional_true_negatives": -247,
+        "additional_true_positives": 91
+      },
+      "training": {
+        "all_logged_values_finite": true,
+        "first_logged_loss": 0.9348,
+        "largest_logged_gradient_norm": 18.124149322509766,
+        "last_logged_loss": 0.0403,
+        "logged_training_points": 37,
+        "loss_decreased": true,
+        "lowest_logged_loss": 0.0282
+      }
+    },
+    "lightgbm": {
+      "file_channel_metrics": {
+        "configuration": {
+          "f1": 0.8528368794326242,
+          "fn": 0,
+          "fp": 166,
+          "precision": 0.7434312210200927,
+          "recall": 1.0,
+          "sample_count": 1414,
+          "tn": 767,
+          "tp": 481
+        },
+        "documentation": {
+          "f1": 0.9907120743034055,
+          "fn": 3,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 0.9815950920245399,
+          "sample_count": 474,
+          "tn": 311,
+          "tp": 160
+        },
+        "infrastructure": {
+          "f1": 0.8350785340314135,
+          "fn": 0,
+          "fp": 126,
+          "precision": 0.7168539325842697,
+          "recall": 1.0,
+          "sample_count": 941,
+          "tn": 496,
+          "tp": 319
+        },
+        "source": {
+          "f1": 0.8179487179487179,
+          "fn": 1,
+          "fp": 141,
+          "precision": 0.6934782608695652,
+          "recall": 0.996875,
+          "sample_count": 999,
+          "tn": 538,
+          "tp": 319
+        },
+        "test": {
+          "f1": 0.8544474393530997,
+          "fn": 0,
+          "fp": 108,
+          "precision": 0.7458823529411764,
+          "recall": 1.0,
+          "sample_count": 972,
+          "tn": 547,
+          "tp": 317
+        }
+      },
+      "final_metrics": {
+        "f1": 0.8541610917848542,
+        "fn": 4,
+        "fp": 541,
+        "precision": 0.7468413664014975,
+        "recall": 0.9975,
+        "tn": 2659,
+        "tp": 1596
+      },
+      "fixed_rules_without_model": {
+        "f1": 0.8229796591533811,
+        "fn": 103,
+        "fp": 541,
+        "precision": 0.7345436702649657,
+        "recall": 0.935625,
+        "tn": 2659,
+        "tp": 1497
+      },
+      "incremental_outcomes": {
+        "introduced_false_alarms": 0,
+        "introduced_misses": 0,
+        "recovered_misses": 99,
+        "removed_false_alarms": 1429
+      },
+      "latency": {
+        "batched_final_test": {
+          "mean_seconds_per_file": 1.0641e-05,
+          "total_inference_seconds": 0.051079
+        },
+        "developer_scale_batch_one": {
+          "batch_size": 1,
+          "mean_warm_seconds_per_file": 0.000718249,
+          "measurement": "model load is reported separately; inference uses a warm model and one file per call",
+          "model": "lightgbm",
+          "model_load_seconds": 1.02262,
+          "sample_count": 256,
+          "sample_selection": "evenly spaced across the untouched final test",
+          "total_warm_inference_seconds": 0.183872
+        }
+      },
+      "model_only_final_metrics": {
+        "f1": 0.958139534883721,
+        "fn": 55,
+        "fp": 80,
+        "precision": 0.9507692307692308,
+        "recall": 0.965625,
+        "tn": 3120,
+        "tp": 1545
+      },
+      "secret_family_metrics": {
+        "aws_access_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 83,
+          "tn": 0,
+          "tp": 83
+        },
+        "azure_storage": {
+          "f1": 0.9789473684210526,
+          "fn": 4,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 0.9587628865979382,
+          "sample_count": 97,
+          "tn": 0,
+          "tp": 93
+        },
+        "basic_auth": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 99,
+          "tn": 0,
+          "tp": 99
+        },
+        "container_digest": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 203,
+          "tn": 203,
+          "tp": 0
+        },
+        "database_url": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "documented_aws_example": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 199,
+          "tn": 199,
+          "tp": 0
+        },
+        "encoded_nonsecret_blob": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 198,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 220,
+          "tn": 22,
+          "tp": 0
+        },
+        "generic_runtime_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 109,
+          "tn": 0,
+          "tp": 109
+        },
+        "git_object_id": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 198,
+          "tn": 198,
+          "tp": 0
+        },
+        "github_pat": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 93,
+          "tn": 0,
+          "tp": 93
+        },
+        "gitlab_pat": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "google_api_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 95,
+          "tn": 0,
+          "tp": 95
+        },
+        "jwt_hs256": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 109,
+          "tn": 0,
+          "tp": 109
+        },
+        "npm_token": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 80,
+          "tn": 0,
+          "tp": 80
+        },
+        "package_integrity": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 193,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 211,
+          "tn": 18,
+          "tp": 0
+        },
+        "placeholder_basic_auth": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 189,
+          "tn": 189,
+          "tp": 0
+        },
+        "placeholder_database_url": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 177,
+          "tn": 177,
+          "tp": 0
+        },
+        "placeholder_github_pat": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 205,
+          "tn": 205,
+          "tp": 0
+        },
+        "placeholder_gitlab_pat": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 208,
+          "tn": 208,
+          "tp": 0
+        },
+        "placeholder_slack_token": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 223,
+          "tn": 223,
+          "tp": 0
+        },
+        "private_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 90,
+          "tn": 0,
+          "tp": 90
+        },
+        "public_key": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 180,
+          "tn": 180,
+          "tp": 0
+        },
+        "resource_identifier": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 202,
+          "tn": 202,
+          "tp": 0
+        },
+        "sendgrid_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "sha256_checksum": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 197,
+          "tn": 197,
+          "tp": 0
+        },
+        "slack_bot_token": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 103,
+          "tn": 0,
+          "tp": 103
+        },
+        "slack_webhook": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 108,
+          "tn": 0,
+          "tp": 108
+        },
+        "split_runtime_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 100,
+          "tn": 0,
+          "tp": 100
+        },
+        "stripe_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 101,
+          "tn": 0,
+          "tp": 101
+        },
+        "template_reference": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 150,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 207,
+          "tn": 57,
+          "tp": 0
+        },
+        "unsigned_example_jwt": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 189,
+          "tn": 189,
+          "tp": 0
+        },
+        "uuid": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 192,
+          "tn": 192,
+          "tp": 0
+        }
+      },
+      "setup_metrics_used_for_selection": {
+        "f1": 0.8682824025289779,
+        "fn": 0,
+        "fp": 125,
+        "precision": 0.7672253258845437,
+        "recall": 1.0,
+        "tn": 663,
+        "tp": 412
+      },
+      "trained_model_value_beyond_fixed_rules": {
+        "additional_false_negatives": -99,
+        "additional_false_positives": 0,
+        "additional_true_negatives": 0,
+        "additional_true_positives": 99
+      },
+      "training": {
+        "all_logged_values_finite": true,
+        "first_logged_loss": null,
+        "largest_logged_gradient_norm": null,
+        "last_logged_loss": null,
+        "logged_training_points": 0,
+        "loss_decreased": false,
+        "lowest_logged_loss": null
+      }
+    },
+    "qwen": {
+      "file_channel_metrics": {
+        "configuration": {
+          "f1": 0.8528368794326242,
+          "fn": 0,
+          "fp": 166,
+          "precision": 0.7434312210200927,
+          "recall": 1.0,
+          "sample_count": 1414,
+          "tn": 767,
+          "tp": 481
+        },
+        "documentation": {
+          "f1": 0.9907120743034055,
+          "fn": 3,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 0.9815950920245399,
+          "sample_count": 474,
+          "tn": 311,
+          "tp": 160
+        },
+        "infrastructure": {
+          "f1": 0.8350785340314135,
+          "fn": 0,
+          "fp": 126,
+          "precision": 0.7168539325842697,
+          "recall": 1.0,
+          "sample_count": 941,
+          "tn": 496,
+          "tp": 319
+        },
+        "source": {
+          "f1": 0.8179487179487179,
+          "fn": 1,
+          "fp": 141,
+          "precision": 0.6934782608695652,
+          "recall": 0.996875,
+          "sample_count": 999,
+          "tn": 538,
+          "tp": 319
+        },
+        "test": {
+          "f1": 0.8544474393530997,
+          "fn": 0,
+          "fp": 108,
+          "precision": 0.7458823529411764,
+          "recall": 1.0,
+          "sample_count": 972,
+          "tn": 547,
+          "tp": 317
+        }
+      },
+      "final_metrics": {
+        "f1": 0.8541610917848542,
+        "fn": 4,
+        "fp": 541,
+        "precision": 0.7468413664014975,
+        "recall": 0.9975,
+        "tn": 2659,
+        "tp": 1596
+      },
+      "fixed_rules_without_model": {
+        "f1": 0.8229796591533811,
+        "fn": 103,
+        "fp": 541,
+        "precision": 0.7345436702649657,
+        "recall": 0.935625,
+        "tn": 2659,
+        "tp": 1497
+      },
+      "incremental_outcomes": {
+        "introduced_false_alarms": 0,
+        "introduced_misses": 0,
+        "recovered_misses": 99,
+        "removed_false_alarms": 1429
+      },
+      "latency": {
+        "batched_final_test": {
+          "mean_seconds_per_file": 0.014440837,
+          "total_inference_seconds": 69.316016
+        },
+        "developer_scale_batch_one": {
+          "batch_size": 1,
+          "mean_warm_seconds_per_file": 0.07753992,
+          "measurement": "model load is reported separately; inference uses a warm model and one file per call",
+          "model": "qwen",
+          "model_load_seconds": 12.995839,
+          "sample_count": 256,
+          "sample_selection": "evenly spaced across the untouched final test",
+          "total_warm_inference_seconds": 19.85022
+        }
+      },
+      "model_only_final_metrics": {
+        "f1": 0.96873992910087,
+        "fn": 97,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 0.939375,
+        "tn": 3200,
+        "tp": 1503
+      },
+      "secret_family_metrics": {
+        "aws_access_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 83,
+          "tn": 0,
+          "tp": 83
+        },
+        "azure_storage": {
+          "f1": 0.9789473684210526,
+          "fn": 4,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 0.9587628865979382,
+          "sample_count": 97,
+          "tn": 0,
+          "tp": 93
+        },
+        "basic_auth": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 99,
+          "tn": 0,
+          "tp": 99
+        },
+        "container_digest": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 203,
+          "tn": 203,
+          "tp": 0
+        },
+        "database_url": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "documented_aws_example": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 199,
+          "tn": 199,
+          "tp": 0
+        },
+        "encoded_nonsecret_blob": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 198,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 220,
+          "tn": 22,
+          "tp": 0
+        },
+        "generic_runtime_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 109,
+          "tn": 0,
+          "tp": 109
+        },
+        "git_object_id": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 198,
+          "tn": 198,
+          "tp": 0
+        },
+        "github_pat": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 93,
+          "tn": 0,
+          "tp": 93
+        },
+        "gitlab_pat": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "google_api_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 95,
+          "tn": 0,
+          "tp": 95
+        },
+        "jwt_hs256": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 109,
+          "tn": 0,
+          "tp": 109
+        },
+        "npm_token": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 80,
+          "tn": 0,
+          "tp": 80
+        },
+        "package_integrity": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 193,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 211,
+          "tn": 18,
+          "tp": 0
+        },
+        "placeholder_basic_auth": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 189,
+          "tn": 189,
+          "tp": 0
+        },
+        "placeholder_database_url": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 177,
+          "tn": 177,
+          "tp": 0
+        },
+        "placeholder_github_pat": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 205,
+          "tn": 205,
+          "tp": 0
+        },
+        "placeholder_gitlab_pat": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 208,
+          "tn": 208,
+          "tp": 0
+        },
+        "placeholder_slack_token": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 223,
+          "tn": 223,
+          "tp": 0
+        },
+        "private_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 90,
+          "tn": 0,
+          "tp": 90
+        },
+        "public_key": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 180,
+          "tn": 180,
+          "tp": 0
+        },
+        "resource_identifier": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 202,
+          "tn": 202,
+          "tp": 0
+        },
+        "sendgrid_key": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 111,
+          "tn": 0,
+          "tp": 111
+        },
+        "sha256_checksum": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 197,
+          "tn": 197,
+          "tp": 0
+        },
+        "slack_bot_token": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 103,
+          "tn": 0,
+          "tp": 103
+        },
+        "slack_webhook": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 108,
+          "tn": 0,
+          "tp": 108
+        },
+        "split_runtime_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 100,
+          "tn": 0,
+          "tp": 100
+        },
+        "stripe_secret": {
+          "f1": 1.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "sample_count": 101,
+          "tn": 0,
+          "tp": 101
+        },
+        "template_reference": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 150,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 207,
+          "tn": 57,
+          "tp": 0
+        },
+        "unsigned_example_jwt": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 189,
+          "tn": 189,
+          "tp": 0
+        },
+        "uuid": {
+          "f1": 0.0,
+          "fn": 0,
+          "fp": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "sample_count": 192,
+          "tn": 192,
+          "tp": 0
+        }
+      },
+      "setup_metrics_used_for_selection": {
+        "f1": 0.8682824025289779,
+        "fn": 0,
+        "fp": 125,
+        "precision": 0.7672253258845437,
+        "recall": 1.0,
+        "tn": 663,
+        "tp": 412
+      },
+      "trained_model_value_beyond_fixed_rules": {
+        "additional_false_negatives": -99,
+        "additional_false_positives": 0,
+        "additional_true_negatives": 0,
+        "additional_true_positives": 99
+      },
+      "training": {
+        "all_logged_values_finite": true,
+        "first_logged_loss": 0.828,
+        "largest_logged_gradient_norm": 46.14329528808594,
+        "last_logged_loss": 0.0785,
+        "logged_training_points": 37,
+        "loss_decreased": true,
+        "lowest_logged_loss": 0.0631
+      }
+    }
+  },
+  "new_example_summary": {
+    "distinct_derived_fact_combinations": 193,
+    "files_with_a_derived_fact_combination_not_seen_in_training": 0,
+    "interpretation": "Every final file, repository, and credential-shaped value is new. The derived facts are intentionally low-cardinality, so an already-seen combination does not mean the underlying file or value was seen in training.",
+    "new_file_count": 4800,
+    "new_repository_count": 240,
+    "repository_overlap_with_training": 0
+  },
+  "recommended_default_from_setup_data": "lightgbm",
+  "setup_ranking_used_for_model_selection": [
+    "lightgbm",
+    "qwen",
+    "granite"
+  ]
+}

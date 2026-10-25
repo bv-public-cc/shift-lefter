@@ -1,0 +1,12 @@
+{
+  "duration_seconds": 1469.733,
+  "records_sha256": "3fb5ccfcdba433b1b5322825208924496bf74932a3b093fbe908e91c084babc6",
+  "sample_count": 4800,
+  "scanner_versions": {
+    "detect-secrets": "1.5.0",
+    "gitleaks": "8.30.1",
+    "trufflehog": "trufflehog 3.99.1"
+  },
+  "test_name": "trained-review-fresh-test-v1",
+  "worker_count": 16
+}

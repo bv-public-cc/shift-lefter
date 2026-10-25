@@ -1,0 +1,31 @@
+{
+  "artifacts": {
+    "granite": {
+      "artifact_path": "granite/ad33297336325989/granite.tar.gz",
+      "checksum_path": "granite/ad33297336325989/granite.tar.gz.sha256",
+      "download_verified": true,
+      "sha256": "ad3329733632598935b6e25f8ce3c4e7dba2af00656826f68cf5b967b5cc3269",
+      "size_bytes": 117917482,
+      "version": "ad33297336325989"
+    },
+    "lightgbm": {
+      "artifact_path": "lightgbm/80720bf362bc247c/lightgbm.tar.gz",
+      "checksum_path": "lightgbm/80720bf362bc247c/lightgbm.tar.gz.sha256",
+      "download_verified": true,
+      "sha256": "80720bf362bc247c5f75b08d3645359757a62df4321d9876f341fb3550a843f4",
+      "size_bytes": 324488,
+      "version": "80720bf362bc247c"
+    },
+    "qwen": {
+      "artifact_path": "qwen/bf319d22aefa7fec/qwen.tar.gz",
+      "checksum_path": "qwen/bf319d22aefa7fec/qwen.tar.gz.sha256",
+      "download_verified": true,
+      "sha256": "bf319d22aefa7fec7372b365950564581a412a223ea2941997bc3a6cf4e8691d",
+      "size_bytes": 126372903,
+      "version": "bf319d22aefa7fec"
+    }
+  },
+  "dataset_name": "trained-review-v1",
+  "repository": "shift-lefter-models",
+  "write_policy": "ALLOW_ONCE"
+}
